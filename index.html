@@ -4,420 +4,667 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ひなまる隊｜缶バッジ配布管理</title>
+
 <style>
+:root{
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",
+  "Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+  color:#202124;
+}
 *{box-sizing:border-box}
-body{margin:0;background:#f4f7f6;color:#17201f;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
-header{background:linear-gradient(135deg,#087e6c,#12b995);color:#fff;padding:22px 16px}
-h1{font-size:21px;margin:0 0 4px}
-.sub{font-size:12px;opacity:.9}
-main{max-width:700px;margin:auto;padding:15px}
-.panel{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px #0000000d}
-h2{font-size:17px;margin:0 0 14px}
-label{display:block;font-size:13px;color:#596866;margin:12px 0 6px}
-input{width:100%;font:inherit;border:1px solid #d5dfdd;border-radius:11px;padding:13px;background:#fff}
-button{width:100%;font:inherit;font-weight:750;border:0;border-radius:11px;padding:13px;margin-top:14px}
-.primary{background:#087e6c;color:#fff}
-.secondary{background:#e6f3f0;color:#087e6c}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px}
-.stat{background:#fff;border-radius:14px;padding:13px;text-align:center}
-.num{font-size:24px;font-weight:800}
-.lab{font-size:11px;color:#687574}
-.item{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid #edf0ef}
-.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#e4efec;font-weight:800;flex:none}
-.info{flex:1;min-width:0}
-.name{font-weight:750}
-.id{font-size:13px;color:#087e6c}
-.meta{font-size:11px;color:#788482;margin-top:3px}
-.badge{font-size:11px;background:#e6f3f0;color:#087e6c;padding:7px 9px;border-radius:99px;white-space:nowrap}
-.search{margin-bottom:4px}
-.empty{text-align:center;color:#7b8583;padding:22px 5px}
-.note{font-size:12px;color:#687574;line-height:1.5;margin-top:10px}
+
+body{
+  margin:0;
+  background:#f4f7f6;
+}
+
+header{
+  background:linear-gradient(135deg,#008f7a,#19b99e);
+  color:white;
+  padding:28px 20px 24px;
+}
+
+header h1{
+  margin:0 0 8px;
+  font-size:25px;
+}
+
+header p{
+  margin:0;
+  font-size:14px;
+  opacity:.95;
+}
+
+main{
+  max-width:720px;
+  margin:auto;
+  padding:18px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.stat{
+  background:white;
+  border-radius:18px;
+  padding:16px 8px;
+  text-align:center;
+  box-shadow:0 3px 12px #0000000d;
+}
+
+.stat strong{
+  display:block;
+  font-size:30px;
+}
+
+.stat span{
+  font-size:13px;
+  color:#687574;
+}
+
+.card{
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 3px 12px #0000000d;
+}
+
+h2{
+  font-size:19px;
+  margin:0 0 16px;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin:14px 0 7px;
+}
+
+input,textarea{
+  width:100%;
+  border:1px solid #d7dfdd;
+  border-radius:12px;
+  padding:14px;
+  font-size:16px;
+  background:#fff;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+.buttons{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+button{
+  flex:1;
+  min-width:130px;
+  border:0;
+  border-radius:12px;
+  padding:14px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary{
+  background:#008f7a;
+  color:white;
+}
+
+.secondary{
+  background:#eef3f2;
+  color:#333;
+}
+
+.danger{
+  background:#fff0f0;
+  color:#c62828;
+}
+
+.status{
+  margin-top:12px;
+  min-height:22px;
+  font-size:14px;
+  color:#087e6c;
+  font-weight:700;
+}
+
+.search{
+  margin-bottom:12px;
+}
+
+.item{
+  border:1px solid #e0e6e4;
+  border-radius:14px;
+  padding:14px;
+  margin-top:10px;
+}
+
+.item-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+}
+
+.item-name{
+  font-size:17px;
+  font-weight:800;
+}
+
+.item-xid{
+  color:#087e6c;
+  font-weight:700;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#e6f7f3;
+  color:#087e6c;
+  font-size:12px;
+  font-weight:700;
+}
+
+.item-meta{
+  margin-top:8px;
+  color:#687574;
+  font-size:13px;
+  white-space:pre-wrap;
+}
+
+.empty{
+  text-align:center;
+  color:#687574;
+  padding:20px 5px;
+}
+
+@media(max-width:500px){
+  main{padding:12px}
+  header{padding:22px 16px}
+  header h1{font-size:22px}
+  .stats{gap:7px}
+  .stat{padding:13px 5px}
+  .stat strong{font-size:26px}
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>🎖️ ひなまる隊 缶バッジ配布管理</h1>
-<div class="sub">名前とX IDを入力して配布済み登録</div>
+  <h1>🎖️ ひなまる隊｜缶バッジ配布管理</h1>
+  <p>名前とX IDを入力して、配布状況を管理します</p>
 </header>
 
 <main>
 
-<div class="stats">
-<div class="stat">
-<div class="num" id="total">0</div>
-<div class="lab">登録人数</div>
-</div>
+  <!-- 統計 -->
+  <section class="stats">
+    <div class="stat">
+      <strong id="total">0</strong>
+      <span>登録人数</span>
+    </div>
 
-<div class="stat">
-<div class="num" id="given">0</div>
-<div class="lab">配布済み</div>
-</div>
-</div>
+    <div class="stat">
+      <strong id="given">0</strong>
+      <span>配布済み</span>
+    </div>
 
-<section class="panel">
+    <div class="stat">
+      <strong id="notGiven">0</strong>
+      <span>未配布</span>
+    </div>
+  </section>
 
-<h2>📝 配布登録</h2>
+  <!-- 登録 -->
+  <section class="card">
 
-<label for="name">名前</label>
-<input
-id="name"
-type="text"
-placeholder="例：HALU">
+    <h2>👤 配布ユーザー登録</h2>
 
-<label for="xid">X ID</label>
-<input
-id="xid"
-type="text"
-placeholder="例：@1980Halu">
+    <label for="name">名前</label>
+    <input
+      id="name"
+      type="text"
+      placeholder="名前を入力してください"
+      autocomplete="off"
+    >
 
-<label for="memo">メモ（任意）</label>
-<input
-id="memo"
-type="text"
-placeholder="例：京都2部">
+    <label for="xid">X ID</label>
+    <input
+      id="xid"
+      type="text"
+      placeholder="@ユーザー名を入力してください"
+      autocomplete="off"
+    >
 
-<button
-class="primary"
-id="register">
-🎖️ 配布済みとして登録
-</button>
+    <label for="memo">メモ（任意）</label>
+    <textarea
+      id="memo"
+      placeholder="必要ならメモを入力してください"
+    ></textarea>
 
-<div class="note">
-※ X IDは「@」付きでも無しでも登録できます。<br>
-※ 同じX IDの二重登録は防止します。
-</div>
+    <div class="buttons">
+      <button class="primary" id="register">
+        🎖️ 配布済みとして登録
+      </button>
 
-</section>
+      <button class="secondary" id="clear">
+        クリア
+      </button>
+    </div>
 
-<section class="panel">
+    <div class="status" id="status"></div>
 
-<h2>🔎 登録済みユーザー</h2>
+  </section>
 
-<input
-class="search"
-id="search"
-type="text"
-placeholder="名前・X ID・メモで検索">
+  <!-- 検索 -->
+  <section class="card">
 
-<div id="list"></div>
+    <h2>🔎 登録ユーザー検索</h2>
 
-</section>
+    <input
+      class="search"
+      id="search"
+      type="search"
+      placeholder="名前・@ID・メモで検索"
+    >
 
-<section class="panel">
+    <div id="list"></div>
 
-<button
-class="secondary"
-id="clearAll">
-⚠️ 全データを削除
-</button>
-
-</section>
+  </section>
 
 </main>
 
 <script>
-"use strict";
 
-const KEY = "hinamaru_badges_simple_v1";
+const STORAGE_KEY = "hinamaru_users_v1";
 
-let users = [];
+let users = loadUsers();
 
-try{
+function loadUsers(){
+  try{
+    const data = localStorage.getItem(STORAGE_KEY);
 
-  users =
-    JSON.parse(
-      localStorage.getItem(KEY) || "[]"
-    );
+    if(!data){
+      return [];
+    }
 
-  if(!Array.isArray(users)){
-    users = [];
+    const parsed = JSON.parse(data);
+
+    return Array.isArray(parsed) ? parsed : [];
+
+  }catch(error){
+
+    console.error(error);
+
+    return [];
   }
+}
 
-}catch(e){
+function saveUsers(){
 
-  users = [];
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(users)
+  );
 
 }
 
+function normalizeXid(value){
 
-const $ = id =>
-  document.getElementById(id);
+  let xid = value.trim();
 
+  if(xid && !xid.startsWith("@")){
+    xid = "@" + xid;
+  }
 
-function save(){
+  return xid;
+}
 
-  localStorage.setItem(
-    KEY,
-    JSON.stringify(users)
-  );
+function escapeHTML(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+function updateStats(){
+
+  const total = users.length;
+
+  const given = users.filter(
+    user => user.given === true
+  ).length;
+
+  const notGiven = total - given;
+
+  document.getElementById("total").textContent = total;
+  document.getElementById("given").textContent = given;
+  document.getElementById("notGiven").textContent = notGiven;
+
+}
+
+function render(){
+
+  updateStats();
+
+  const keyword =
+    document
+      .getElementById("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+  let filtered = users;
+
+  if(keyword){
+
+    filtered = users.filter(user => {
+
+      return (
+        user.name.toLowerCase().includes(keyword) ||
+        user.xid.toLowerCase().includes(keyword) ||
+        user.memo.toLowerCase().includes(keyword)
+      );
+
+    });
+
+  }
+
+  const list = document.getElementById("list");
+
+  if(filtered.length === 0){
+
+    list.innerHTML =
+      '<div class="empty">登録ユーザーはいません</div>';
+
+    return;
+  }
+
+  list.innerHTML = filtered.map(user => {
+
+    const date =
+      user.givenAt || user.createdAt || "";
+
+    return `
+      <div class="item">
+
+        <div class="item-head">
+
+          <div>
+            <div class="item-name">
+              ${escapeHTML(user.name)}
+            </div>
+
+            <div class="item-xid">
+              ${escapeHTML(user.xid)}
+            </div>
+          </div>
+
+          <span class="badge">
+            ${user.given ? "配布済み" : "未配布"}
+          </span>
+
+        </div>
+
+        ${
+          user.memo
+          ? `<div class="item-meta">
+               📝 ${escapeHTML(user.memo)}
+             </div>`
+          : ""
+        }
+
+        ${
+          date
+          ? `<div class="item-meta">
+               登録日時：${escapeHTML(date)}
+             </div>`
+          : ""
+        }
+
+        <div class="buttons">
+
+          <button
+            class="secondary"
+            onclick="toggleGiven('${user.id}')"
+          >
+            ${
+              user.given
+              ? "未配布に戻す"
+              : "配布済みにする"
+            }
+          </button>
+
+          <button
+            class="danger"
+            onclick="deleteUser('${user.id}')"
+          >
+            削除
+          </button>
+
+        </div>
+
+      </div>
+    `;
+
+  }).join("");
+
+}
+
+function showStatus(message){
+
+  const status =
+    document.getElementById("status");
+
+  status.textContent = message;
+
+  setTimeout(() => {
+
+    status.textContent = "";
+
+  },3000);
+
+}
+
+document
+  .getElementById("register")
+  .addEventListener("click",() => {
+
+    const name =
+      document
+        .getElementById("name")
+        .value
+        .trim();
+
+    let xid =
+      normalizeXid(
+        document
+          .getElementById("xid")
+          .value
+      );
+
+    const memo =
+      document
+        .getElementById("memo")
+        .value
+        .trim();
+
+    if(!name || !xid){
+
+      alert("名前とX IDを入力してください");
+
+      return;
+    }
+
+    if(xid === "@"){
+
+      alert("X IDを入力してください");
+
+      return;
+    }
+
+    const old =
+      users.find(
+        user =>
+          user.xid.toLowerCase() === xid.toLowerCase()
+      );
+
+    if(old){
+
+      if(old.given){
+
+        alert(
+          "このX IDはすでに配布済みです。"
+        );
+
+        return;
+      }
+
+      old.name = name;
+      old.memo = memo;
+      old.given = true;
+      old.givenAt =
+        new Date().toLocaleString("ja-JP");
+
+      saveUsers();
+
+      showStatus(
+        "🎖️ 配布済みとして登録しました！"
+      );
+
+    }else{
+
+      users.unshift({
+
+        id:
+          Date.now().toString(),
+
+        name:name,
+
+        xid:xid,
+
+        memo:memo,
+
+        given:true,
+
+        createdAt:
+          new Date().toLocaleString("ja-JP"),
+
+        givenAt:
+          new Date().toLocaleString("ja-JP")
+
+      });
+
+      saveUsers();
+
+      showStatus(
+        "🎖️ 配布済みとして登録しました！"
+      );
+
+    }
+
+    document.getElementById("name").value = "";
+    document.getElementById("xid").value = "";
+    document.getElementById("memo").value = "";
+
+    render();
+
+  });
+
+document
+  .getElementById("clear")
+  .addEventListener("click",() => {
+
+    document.getElementById("name").value = "";
+    document.getElementById("xid").value = "";
+    document.getElementById("memo").value = "";
+
+    document.getElementById("status").textContent = "";
+
+  });
+
+document
+  .getElementById("search")
+  .addEventListener("input",render);
+
+function toggleGiven(id){
+
+  const user =
+    users.find(
+      user => user.id === id
+    );
+
+  if(!user){
+    return;
+  }
+
+  user.given = !user.given;
+
+  if(user.given){
+
+    user.givenAt =
+      new Date().toLocaleString("ja-JP");
+
+  }else{
+
+    user.givenAt = "";
+
+  }
+
+  saveUsers();
 
   render();
 
 }
 
+function deleteUser(id){
 
-function cleanXid(value){
-
-  let x =
-    String(value || "").trim();
-
-  x =
-    x.replace(
-      /[＠﹫]/g,
-      "@"
+  const user =
+    users.find(
+      user => user.id === id
     );
 
-  if(
-    x &&
-    !x.startsWith("@")
-  ){
-
-    x =
-      "@" +
-      x.slice(0,15);
-
-  }
-
-  return x;
-
-}
-
-
-function esc(s){
-
-  return String(
-    s ?? ""
-  ).replace(
-    /[&<>"']/g,
-    c => ({
-
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#39;"
-
-    }[c])
-  );
-
-}
-
-
-function render(){
-
-  const q =
-    $("search")
-      .value
-      .trim()
-      .toLowerCase();
-
-
-  const shown =
-    users.filter(u =>
-      `${u.name} ${u.xid} ${u.memo}`
-        .toLowerCase()
-        .includes(q)
-    );
-
-
-  $("total").textContent =
-    users.length;
-
-
-  $("given").textContent =
-    users.filter(
-      u => u.given
-    ).length;
-
-
-  if(!shown.length){
-
-    $("list").innerHTML =
-      '<div class="empty">まだ登録されていません</div>';
-
+  if(!user){
     return;
-
   }
 
-
-  $("list").innerHTML =
-    shown.map(u => `
-
-      <div class="item">
-
-        <div class="avatar">
-          ${esc(
-            (u.name || "?")
-              .slice(0,1)
-          )}
-        </div>
-
-        <div class="info">
-
-          <div class="name">
-            ${esc(u.name)}
-          </div>
-
-          <div class="id">
-            ${esc(u.xid)}
-          </div>
-
-          <div class="meta">
-            ${esc(u.memo || "")}
-            ${esc(u.date || "")}
-          </div>
-
-        </div>
-
-        <span class="badge">
-          ✓ 配布済み
-        </span>
-
-      </div>
-
-    `).join("");
-
-}
-
-
-$("register")
-.addEventListener(
-  "click",
-  () => {
-
-    const name =
-      $("name")
-        .value
-        .trim();
-
-
-    const xid =
-      cleanXid(
-        $("xid").value
-      );
-
-
-    const memo =
-      $("memo")
-        .value
-        .trim();
-
-
-    if(
-      !name ||
-      !xid
-    ){
-
-      alert(
-        "名前とX IDを入力してください"
-      );
-
-      return;
-
-    }
-
-
-    const old =
-      users.find(
-        u =>
-          String(u.xid)
-            .toLowerCase() ===
-          xid.toLowerCase()
-      );
-
-
-    if(old){
-
-      alert(
-        "このX IDはすでに登録されています。"
-      );
-
-      return;
-
-    }
-
-
-    users.unshift({
-
-      id:
-        Date.now().toString(),
-
-      name,
-
-      xid,
-
-      memo,
-
-      given:true,
-
-      date:
-        new Date()
-          .toLocaleString("ja-JP")
-
-    });
-
-
-    save();
-
-
-    $("name").value =
-      "";
-
-    $("xid").value =
-      "";
-
-    $("memo").value =
-      "";
-
-
-    alert(
-      "🎖️ 配布済みとして登録しました！"
+  const ok =
+    confirm(
+      `${user.name}（${user.xid}）を削除しますか？`
     );
 
+  if(!ok){
+    return;
   }
-);
 
+  users =
+    users.filter(
+      user => user.id !== id
+    );
 
-$("search")
-.addEventListener(
-  "input",
-  render
-);
+  saveUsers();
 
+  render();
 
-$("clearAll")
-.addEventListener(
-  "click",
-  () => {
-
-    if(!users.length){
-
-      alert(
-        "削除するデータがありません"
-      );
-
-      return;
-
-    }
-
-
-    if(
-      confirm(
-        "登録データをすべて削除しますか？"
-      )
-    ){
-
-      users = [];
-
-      save();
-
-    }
-
-  }
-);
-
+}
 
 render();
 
