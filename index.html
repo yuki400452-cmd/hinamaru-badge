@@ -244,46 +244,69 @@ function detect(text){
   showReview(nameLine, xid);
 
   return {
-    name: nameLine,
-    xid: xid
-  };
-}
-
-
+  name: nameLine,
+  xid: xid
+};
+// 写真を選択・撮影したとき
+// OCR強化版
+// ================================
 // ================================
 // 写真を選択・撮影したとき
 // OCR強化版
 // ================================
+
 $("photo").addEventListener("change", async (e) => {
 
   const file = e.target.files?.[0];
-  if (!file) return;
+
+  if (!file) {
+    console.log("写真が選択されていません");
+    return;
+  }
 
   const preview = $("preview");
   const ocrStatus = $("ocrStatus");
 
+  console.log("写真を取得しました:", file.name, file.type);
+
+  // -------------------------------
   // プレビュー表示
-  preview.src = URL.createObjectURL(file);
+  // -------------------------------
+
+  const imageUrl = URL.createObjectURL(file);
+
+  preview.src = imageUrl;
   preview.style.display = "block";
 
-  ocrStatus.textContent = "🔍 写真を解析しています…";
+  ocrStatus.textContent =
+    "🔍 写真を読み込んでいます…";
 
   try {
 
-    // --------------------------------
-    // Tesseract.js を読み込む
-    // --------------------------------
+    // -------------------------------
+    // Tesseract.js 読み込み
+    // -------------------------------
+
     if (!window.Tesseract) {
+
+      ocrStatus.textContent =
+        "🔍 OCRエンジンを起動しています…";
 
       await new Promise((resolve, reject) => {
 
-        const script = document.createElement("script");
+        const script =
+          document.createElement("script");
 
         script.src =
           "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
 
         script.onload = resolve;
-        script.onerror = reject;
+
+        script.onerror = () => {
+          reject(
+            new Error("Tesseract.jsの読み込みに失敗しました")
+          );
+        };
 
         document.head.appendChild(script);
 
@@ -291,40 +314,53 @@ $("photo").addEventListener("change", async (e) => {
 
     }
 
-    // --------------------------------
+    // -------------------------------
     // OCR開始
-    // --------------------------------
+    // -------------------------------
+
     ocrStatus.textContent =
       "🔍 Xプロフィールを自動認識中…";
+
+    console.log("OCR開始");
 
     const result = await Tesseract.recognize(
       file,
       "jpn+eng",
       {
-        logger: m => {
+        logger: message => {
 
-          if (m.status === "recognizing text") {
+          console.log("OCR:", message);
+
+          if (message.status === "recognizing text") {
 
             const percent =
-              Math.round((m.progress || 0) * 100);
+              Math.round(
+                (message.progress || 0) * 100
+              );
 
             ocrStatus.textContent =
               `🔍 文字を認識中… ${percent}%`;
-
           }
 
         }
       }
     );
 
-    // --------------------------------
+    // -------------------------------
     // OCR結果
-    // --------------------------------
-    const text = result?.data?.text || "";
+    // -------------------------------
 
-    console.log("===== OCR RESULT =====");
+    const text =
+      result?.data?.text || "";
+
+    console.log("====================");
+    console.log("OCR RESULT");
     console.log(text);
-    console.log("======================");
+    console.log("====================");
+
+    // -------------------------------
+    // OCR結果なし
+    // -------------------------------
 
     if (!text.trim()) {
 
@@ -336,18 +372,24 @@ $("photo").addEventListener("change", async (e) => {
       return;
     }
 
-    // --------------------------------
-    // detect() に渡す
-    // --------------------------------
+    // -------------------------------
+    // detect()でX IDを検索
+    // -------------------------------
+
+    console.log("detect開始");
+
     const found = detect(text);
 
-    // --------------------------------
-    // X IDを発見
-    // --------------------------------
+    console.log("detect結果:", found);
+
+    // -------------------------------
+    // X ID発見
+    // -------------------------------
+
     if (found && found.xid) {
 
       ocrStatus.innerHTML =
-        `<span class="ok">✓ X IDを認識しました</span>`;
+        '<span class="ok">✓ X IDを認識しました</span>';
 
       showReview(
         found.name || "",
@@ -356,9 +398,10 @@ $("photo").addEventListener("change", async (e) => {
 
     }
 
-    // --------------------------------
+    // -------------------------------
     // X IDが見つからない
-    // --------------------------------
+    // -------------------------------
+
     else {
 
       ocrStatus.textContent =
@@ -371,9 +414,9 @@ $("photo").addEventListener("change", async (e) => {
 
     }
 
-  } catch (err) {
+  } catch (error) {
 
-    console.error("OCR error:", err);
+    console.error("OCR ERROR:", error);
 
     ocrStatus.textContent =
       "⚠️ 自動認識に失敗しました。もう一度撮影してください。";
@@ -383,6 +426,8 @@ $("photo").addEventListener("change", async (e) => {
   }
 
 });
+
+
 
 // 配布済みに登録
 $("register").addEventListener("click",()=>{
