@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ひなまる隊｜缶バッジ配布管理</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:#17201f;background:#f4f7f6}
+*{box-sizing:border-box}body{margin:0;background:#f4f7f6}header{background:linear-gradient(135deg,#087e6c,#12b995);color:white;padding:20px 16px}
+h1{font-size:21px;margin:0 0 4px}.sub{font-size:12px;opacity:.9}main{max-width:760px;margin:auto;padding:14px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.card,.panel{background:white;border-radius:16px;box-shadow:0 2px 10px #0000000b}.card{text-align:center;padding:12px 6px}.num{font-size:24px;font-weight:800}.lab{font-size:11px;color:#687574}.panel{padding:15px;margin-bottom:12px}
+h2{font-size:16px;margin:0 0 11px}.camera{border:2px dashed #b9ceca;border-radius:14px;padding:18px;text-align:center;background:#f7fbfa}
+.camera strong{display:block;font-size:16px;margin-bottom:5px}.hint{font-size:12px;color:#667573;line-height:1.5}
+button{font:inherit;border:0;border-radius:11px;padding:12px 15px;font-weight:750;min-height:44px;cursor:pointer}.primary{background:#087e6c;color:#fff}.secondary{background:#e6f3f0;color:#086d5d}.danger{background:#fff0ef;color:#a42319}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}input,textarea{width:100%;font:inherit;border:1px solid #d5dfdd;border-radius:10px;padding:11px;background:#fff}label{display:block;font-size:12px;color:#596866;margin:9px 0 5px}
+.preview{width:100%;max-height:260px;object-fit:contain;border-radius:12px;background:#111;margin-top:10px;display:none}.status{margin-top:10px;font-size:12px;color:#596866}.ok{color:#087e6c;font-weight:700}
+.review{display:none}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.item{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid #edf0ef}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#e4efec;font-weight:800;flex:none}.info{flex:1;min-width:0}.name{font-weight:750}.id{font-size:12px;color:#087e6c}.meta{font-size:11px;color:#788482;margin-top:2px}.badge{padding:7px 8px;border-radius:99px;font-size:11px;background:#e6f3f0;color:#087e6c;white-space:nowrap}
+.search{margin-bottom:8px}.empty{text-align:center;color:#7b8583;padding:22px 5px}small{display:block;color:#7a8583;line-height:1.5;margin-top:8px}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>🎖️ ひなまる隊 缶バッジ配布管理</h1><div class="sub">現地で「撮影 → 自動認識 → 確認 → 配布済み」を最短操作</div></header>
+<main>
+<section class="cards">
+<div class="card"><div class="num" id="total">0</div><div class="lab">登録人数</div></div>
+<div class="card"><div class="num" id="given">0</div><div class="lab">配布済み</div></div>
+<div class="card"><div class="num" id="left">0</div><div class="lab">未配布</div></div>
+</section>
+
+<section class="panel">
+<h2>📸 1. Xプロフィールを撮影</h2>
+<div class="camera">
+<strong>相手のXプロフィール画面を撮影</strong>
+<div class="hint">プロフィール画面の「名前」と「@ユーザー名」が見える状態で撮影してください。</div>
+<div class="btns" style="justify-content:center">
+<label for="photo" class="primary" style="margin:0;padding:12px 15px;border-radius:11px;color:white;font-weight:750;cursor:pointer">📷 カメラを起動</label>
+<input id="photo" type="file" accept="image/*" capture="environment" style="display:none">
+</div>
+<img id="preview" class="preview" alt="撮影したプロフィール画像">
+<div id="ocrStatus" class="status">写真を撮ると自動認識を開始します。</div>
+</div>
+</section>
+
+<section class="panel review" id="review">
+<h2>✏️ 2. 認識結果を確認</h2>
+<div class="grid">
+<div><label>名前</label><input id="name" placeholder="自動認識"></div>
+<div><label>X ID</label><input id="xid" placeholder="@example"></div>
+</div>
+<label>メモ（任意）</label><input id="memo" placeholder="例：京都・2部">
+<div class="btns">
+<button class="primary" id="register">🎖️ 登録して配布済みにする</button>
+<button class="secondary" id="reset">撮り直す</button>
+</div>
+<small>「登録して配布済みにする」を押した瞬間に、今回の缶バッジを渡した記録として保存します。</small>
+</section>
+
+<section class="panel">
+<h2>🔎 配布ユーザー</h2>
+<input class="search" id="search" placeholder="名前・@ID・メモで検索">
+<div id="list"></div>
+</section>
+</main>
+
+<script>
+const KEY="hinamaru_badges_v2";
+let users=JSON.parse(localStorage.getItem(KEY)||"[]");
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify(users));render()}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function render(){
+ const q=$("search").value.toLowerCase();
+ const shown=users.filter(u=>`${u.name} ${u.xid} ${u.memo}`.toLowerCase().includes(q));
+ $("total").textContent=users.length;
+ $("given").textContent=users.filter(u=>u.given).length;
+ $("left").textContent=users.filter(u=>!u.given).length;
+ $("list").innerHTML=shown.length?shown.map(u=>`<div class="item">
+ <div class="avatar">${esc((u.name||"?").slice(0,1))}</div>
+ <div class="info"><div class="name">${esc(u.name)}</div><div class="id">${esc(u.xid)}</div><div class="meta">${esc(u.memo||"")}・${esc(u.date)}</div></div>
+ <span class="badge">${u.given?"✓ 配布済み":"未配布"}</span></div>`).join(""):'<div class="empty">まだ登録されたユーザーはいません</div>';
+}
+function showReview(name,xid){
+ $("name").value=name||"";$("xid").value=xid||"";$("review").style.display="block";
+ $("review").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function detect(text){
+ const lines=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+ const matches=[...text.matchAll(/@([A-Za-z0-9_]{1,15})/g)].map(m=>"@"+m[1]);
+ const xid=matches[0]||"";
+ const nameLine=lines.find(s=>!/^@[A-Za-z0-9_]{1,15}$/.test(s) && !/^(フォロー|フォロワー|投稿|返信|いいね|Following|Followers)$/i.test(s) && s.length<=40);
+ showReview(nameLine||"",xid);
+ return {name:nameLine||"",xid};
+}
+$("photo").addEventListener("change",async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ $("preview").src=URL.createObjectURL(file);$("preview").style.display="block";
+ $("ocrStatus").textContent="🔍 写真を解析中…";
+ try{
+   if(!window.Tesseract){
+     await new Promise((resolve,reject)=>{
+       const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+     });
+   }
+   const result=await Tesseract.recognize(file,"jpn+eng",{logger:m=>{
+     if(m.status==="recognizing text") $("ocrStatus").textContent=`🔍 文字を認識中… ${Math.round((m.progress||0)*100)}%`;
+   }});
+   const found=detect(result.data.text);
+   if(found.xid) $("ocrStatus").innerHTML='<span class="ok">✓ X IDを認識しました。内容を確認してください。</span>';
+   else $("ocrStatus").textContent="⚠️ @から始まるX IDを認識できませんでした。写真を撮り直すか手入力してください。";
+ }catch(err){
+   $("ocrStatus").textContent="⚠️ 自動認識を起動できませんでした。X IDと名前を手入力できます。";
+   showReview("","");
+ }
+});
+$("register").addEventListener("click",()=>{
+ let name=$("name").value.trim(), xid=$("xid").value.trim();
+ if(xid && !xid.startsWith("@")) xid="@"+xid;
+ if(!name||!xid||xid==="@"){alert("名前とX IDを確認してください");return}
+ const old=users.find(u=>u.xid.toLowerCase()===xid.toLowerCase());
+ if(old){
+   if(old.given){alert("このX IDはすでに配布済みです。二重配布を防止しました。");return}
+   old.name=name;old.memo=$("memo").value.trim();old.given=true;old.givenAt=new Date().toLocaleString("ja-JP");
+ }else{
+   users.unshift({id:Date.now().toString(),name,xid,memo:$("memo").value.trim(),given:true,date:new Date().toLocaleDateString("ja-JP"),givenAt:new Date().toLocaleString("ja-JP")});
+ }
+ save();$("review").style.display="none";$("photo").value="";$("preview").style.display="none";$("ocrStatus").textContent="写真を撮ると自動認識を開始します。";
+ alert("🎖️ 配布済みとして登録しました！");
+});
+$("reset").addEventListener("click",()=>{$("review").style.display="none";$("photo").value="";$("preview").style.display="none";$("ocrStatus").textContent="写真を撮ると自動認識を開始します。"});
+$("search").addEventListener("input",render);
+render();
+</script>
+</body></html>
