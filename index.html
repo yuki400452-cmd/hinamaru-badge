@@ -83,16 +83,56 @@ function render(){
 }
 function showReview(name,xid){
  $("name").value=name||"";$("xid").value=xid||"";$("review").style.display="block";
- $("review").scrollIntoView({behavior:"smooth",block:"center"});
+ $("review").scrollIntoView({behavior:"smooth",block:"function detect(text){
+  function detect(text){
+                             const lines = text
+    .split(/\r?\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const matches = [...text.matchAll(/@[A-Za-z0-9_]{1,15}/g)];
+  const xid = matches.length ? matches[0][0] : "";
+
+  let nameLine = "";
+
+  if (xid) {
+    const idIndex = lines.findIndex(line => line.includes(xid));
+
+    if (idIndex > 0) {
+      for (let i = idIndex - 1; i >= Math.max(0, idIndex - 5); i--) {
+        const candidate = lines[i];
+
+        if (
+          candidate &&
+          candidate.length <= 30 &&
+          !candidate.startsWith("@") &&
+          !candidate.includes("フォロー") &&
+          !candidate.includes("フォロワー") &&
+          !candidate.includes("フォロー中") &&
+          !candidate.match(/\d{3,}/)
+        ) {
+          nameLine = candidate;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!nameLine) {
+    nameLine = lines.find(line =>
+      line.length <= 20 &&
+      !line.startsWith("@") &&
+      !line.includes("フォロー") &&
+      !line.includes("フォロワー") &&
+      !line.includes("フォロー中") &&
+      !line.match(/\d{4}/)
+    ) || "";
+  }
+
+  showReview(nameLine, xid);
+  return {name:nameLine, xid:xid};
 }
-function detect(text){
- const lines=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
- const matches=[...text.matchAll(/@([A-Za-z0-9_]{1,15})/g)].map(m=>"@"+m[1]);
- const xid=matches[0]||"";
- const nameLine=lines.find(s=>!/^@[A-Za-z0-9_]{1,15}$/.test(s) && !/^(フォロー|フォロワー|投稿|返信|いいね|Following|Followers)$/i.test(s) && s.length<=40);
- showReview(nameLine||"",xid);
- return {name:nameLine||"",xid};
-}
+
 $("photo").addEventListener("change",async e=>{
  const file=e.target.files?.[0];if(!file)return;
  $("preview").src=URL.createObjectURL(file);$("preview").style.display="block";
