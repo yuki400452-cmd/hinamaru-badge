@@ -2,567 +2,375 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="apple-touch-icon" href="./hinamaru_icon_180.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ひなまる隊｜缶バッジ配布管理</title>
 <style>
-:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:#17201f;background:#f4f7f6}
 *{box-sizing:border-box}
-body{margin:0;background:#f4f7f6}
-header{background:linear-gradient(135deg,#087e6c,#12b995);color:#fff;padding:20px 16px}
+body{margin:0;background:#f4f7f6;color:#17201f;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+header{background:linear-gradient(135deg,#087e6c,#12b995);color:#fff;padding:22px 16px}
 h1{font-size:21px;margin:0 0 4px}
 .sub{font-size:12px;opacity:.9}
-main{max-width:760px;margin:auto;padding:14px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.card,.panel{background:#fff;border-radius:16px;box-shadow:0 2px 10px #0000000b}
-.card{text-align:center;padding:12px 6px}
+main{max-width:700px;margin:auto;padding:15px}
+.panel{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px #0000000d}
+h2{font-size:17px;margin:0 0 14px}
+label{display:block;font-size:13px;color:#596866;margin:12px 0 6px}
+input{width:100%;font:inherit;border:1px solid #d5dfdd;border-radius:11px;padding:13px;background:#fff}
+button{width:100%;font:inherit;font-weight:750;border:0;border-radius:11px;padding:13px;margin-top:14px}
+.primary{background:#087e6c;color:#fff}
+.secondary{background:#e6f3f0;color:#087e6c}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px}
+.stat{background:#fff;border-radius:14px;padding:13px;text-align:center}
 .num{font-size:24px;font-weight:800}
 .lab{font-size:11px;color:#687574}
-.panel{padding:15px;margin-bottom:12px}
-h2{font-size:16px;margin:0 0 11px}
-.camera{border:2px dashed #b9ceca;border-radius:14px;padding:18px;text-align:center;background:#f7fbfa}
-.camera strong{display:block;font-size:16px;margin-bottom:5px}
-.hint{font-size:12px;color:#667573;line-height:1.5}
-button{font:inherit;border:0;border-radius:11px;padding:12px 15px;font-weight:750;min-height:44px;cursor:pointer}
-.primary{background:#087e6c;color:#fff}
-.secondary{background:#e6f3f0;color:#086d5d}
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-input,textarea{width:100%;font:inherit;border:1px solid #d5dfdd;border-radius:10px;padding:11px;background:#fff}
-label{display:block;font-size:12px;color:#596866;margin:9px 0 5px}
-.preview{width:100%;max-height:360px;object-fit:contain;border-radius:12px;background:#111;margin-top:10px;display:none}
-.status{margin-top:10px;font-size:12px;color:#596866;line-height:1.5}
-.ok{color:#087e6c;font-weight:700}
-.review{display:none}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.item{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid #edf0ef}
+.item{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid #edf0ef}
 .avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#e4efec;font-weight:800;flex:none}
 .info{flex:1;min-width:0}
 .name{font-weight:750}
-.id{font-size:12px;color:#087e6c}
-.meta{font-size:11px;color:#788482;margin-top:2px}
-.badge{padding:7px 8px;border-radius:99px;font-size:11px;background:#e6f3f0;color:#087e6c;white-space:nowrap}
-.search{margin-bottom:8px}
+.id{font-size:13px;color:#087e6c}
+.meta{font-size:11px;color:#788482;margin-top:3px}
+.badge{font-size:11px;background:#e6f3f0;color:#087e6c;padding:7px 9px;border-radius:99px;white-space:nowrap}
+.search{margin-bottom:4px}
 .empty{text-align:center;color:#7b8583;padding:22px 5px}
-small{display:block;color:#7a8583;line-height:1.5;margin-top:8px}
-@media(max-width:500px){.grid{grid-template-columns:1fr}}
+.note{font-size:12px;color:#687574;line-height:1.5;margin-top:10px}
 </style>
 </head>
 
 <body>
+
 <header>
-  <h1>🎖️ ひなまる隊 缶バッジ配布管理</h1>
-  <div class="sub">撮影 → 自動認識 → 確認 → 配布済み</div>
+<h1>🎖️ ひなまる隊 缶バッジ配布管理</h1>
+<div class="sub">名前とX IDを入力して配布済み登録</div>
 </header>
 
 <main>
-<section class="cards">
-  <div class="card"><div class="num" id="total">0</div><div class="lab">登録人数</div></div>
-  <div class="card"><div class="num" id="given">0</div><div class="lab">配布済み</div></div>
-  <div class="card"><div class="num" id="left">0</div><div class="lab">未配布</div></div>
+
+<div class="stats">
+<div class="stat">
+<div class="num" id="total">0</div>
+<div class="lab">登録人数</div>
+</div>
+
+<div class="stat">
+<div class="num" id="given">0</div>
+<div class="lab">配布済み</div>
+</div>
+</div>
+
+<section class="panel">
+
+<h2>📝 配布登録</h2>
+
+<label for="name">名前</label>
+<input
+id="name"
+type="text"
+placeholder="例：HALU">
+
+<label for="xid">X ID</label>
+<input
+id="xid"
+type="text"
+placeholder="例：@1980Halu">
+
+<label for="memo">メモ（任意）</label>
+<input
+id="memo"
+type="text"
+placeholder="例：京都2部">
+
+<button
+class="primary"
+id="register">
+🎖️ 配布済みとして登録
+</button>
+
+<div class="note">
+※ X IDは「@」付きでも無しでも登録できます。<br>
+※ 同じX IDの二重登録は防止します。
+</div>
+
 </section>
 
 <section class="panel">
-  <h2>📸 1. Xプロフィールを撮影</h2>
-  <div class="camera">
-    <strong>相手のXプロフィール画面を撮影</strong>
-    <div class="hint">
-      「名前」と「@ユーザー名」が見える状態で撮影してください。<br>
-      自動認識できない場合は、確認画面で手入力できます。
-    </div>
 
-    <div class="btns" style="justify-content:center">
-      <label for="photo" class="primary"
-        style="margin:0;padding:12px 15px;border-radius:11px;color:white;font-weight:750;cursor:pointer">
-        📷 カメラを起動
-      </label>
-      <input id="photo" type="file" accept="image/*" capture="environment" style="display:none">
-    </div>
+<h2>🔎 登録済みユーザー</h2>
 
-    <img id="preview" class="preview" alt="撮影したプロフィール画像">
-    <div id="ocrStatus" class="status">写真を撮ると自動認識を開始します。</div>
-  </div>
-</section>
+<input
+class="search"
+id="search"
+type="text"
+placeholder="名前・X ID・メモで検索">
 
-<section class="panel review" id="review">
-  <h2>✏️ 2. 認識結果を確認</h2>
+<div id="list"></div>
 
-  <div class="grid">
-    <div>
-      <label>名前</label>
-      <input id="name" placeholder="自動認識または手入力">
-    </div>
-    <div>
-      <label>X ID</label>
-      <input id="xid" placeholder="@example">
-    </div>
-  </div>
-
-  <label>メモ（任意）</label>
-  <input id="memo" placeholder="例：京都・2部">
-
-  <div class="btns">
-    <button class="primary" id="register">🎖️ 登録して配布済みにする</button>
-    <button class="secondary" id="reset">撮り直す</button>
-  </div>
-
-  <small>
-    X IDが自動認識できなくても、ここに「@ユーザー名」を入力して登録できます。
-  </small>
 </section>
 
 <section class="panel">
-  <h2>🔎 配布ユーザー</h2>
-  <input class="search" id="search" placeholder="名前・@ID・メモで検索">
-  <div id="list"></div>
+
+<button
+class="secondary"
+id="clearAll">
+⚠️ 全データを削除
+</button>
+
 </section>
+
 </main>
 
 <script>
 "use strict";
 
-const KEY = "hinamaru_badges_v2";
+const KEY = "hinamaru_badges_simple_v1";
+
 let users = [];
 
-try {
-  users = JSON.parse(localStorage.getItem(KEY) || "[]");
-  if (!Array.isArray(users)) users = [];
-} catch (e) {
-  users = [];
-}
+try{
 
-const $ = id => document.getElementById(id);
-
-function save(){
-  localStorage.setItem(KEY, JSON.stringify(users));
-  render();
-}
-
-function esc(s){
-  return String(s ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[c]));
-}
-
-function render(){
-  const q = $("search").value.toLowerCase();
-
-  const shown = users.filter(u =>
-    `${u.name || ""} ${u.xid || ""} ${u.memo || ""}`
-      .toLowerCase()
-      .includes(q)
-  );
-
-  $("total").textContent = users.length;
-  $("given").textContent = users.filter(u => u.given).length;
-  $("left").textContent = users.filter(u => !u.given).length;
-
-  $("list").innerHTML = shown.length
-    ? shown.map(u => `
-      <div class="item">
-        <div class="avatar">${esc((u.name || "?").slice(0,1))}</div>
-        <div class="info">
-          <div class="name">${esc(u.name)}</div>
-          <div class="id">${esc(u.xid)}</div>
-          <div class="meta">${esc(u.memo || "")}・${esc(u.date || "")}</div>
-        </div>
-        <span class="badge">${u.given ? "✓ 配布済み" : "未配布"}</span>
-      </div>
-    `).join("")
-    : '<div class="empty">まだ登録されたユーザーはいません</div>';
-}
-
-function showReview(name, xid){
-  $("name").value = name || "";
-  $("xid").value = xid || "";
-  $("review").style.display = "block";
-
-  $("review").scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-}
-
-function cleanXid(value){
-  let x = String(value || "")
-    .trim()
-    .replace(/[＠﹫]/g, "@")
-    .replace(/^@+/, "");
-
-  x = x.replace(/[^A-Za-z0-9_].*$/, "");
-
-  if (!/^[A-Za-z0-9_]{2,15}$/.test(x)) {
-    return "";
-  }
-
-  return "@" + x;
-}
- async function runOCR(file){
-
-  $("ocrStatus").textContent =
-    "🔍 OCRエンジンを起動しています…";
-
-  try {
-
-    /*
-     * Tesseract.jsを動的に読み込む
-     */
-    if (!window.Tesseract) {
-
-      await new Promise((resolve, reject) => {
-
-        const script = document.createElement("script");
-
-        script.src =
-          "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
-
-        script.onload = resolve;
-        script.onerror = () =>
-          reject(new Error("Tesseract.jsの読み込みに失敗しました"));
-
-        document.head.appendChild(script);
-
-      });
-
-    }
-
-    $("ocrStatus").textContent =
-      "🔍 写真を解析しています…";
-
-    /*
-     * 日本語＋英語でOCR
-     */
-    const result = await Tesseract.recognize(
-      file,
-      "jpn+eng",
-      {
-        logger: m => {
-
-          if (m.status === "recognizing text") {
-
-            const p = Math.round((m.progress || 0) * 100);
-
-            $("ocrStatus").textContent =
-              `🔍 文字を認識しています… ${p}%`;
-
-          }
-
-        }
-      }
+  users =
+    JSON.parse(
+      localStorage.getItem(KEY) || "[]"
     );
 
-    const text =
-      result?.data?.text || "";
-
-    console.log("===== OCR RESULT =====");
-    console.log(text);
-    console.log("======================");
-
-    /*
-     * OCR結果から名前とX IDを探す
-     */
-    const found = detectXProfile(text);
-
-    if (found.xid) {
-
-      $("ocrStatus").innerHTML =
-        `<span class="ok">✓ X IDを認識しました</span>`;
-
-      showReview(
-        found.name || "",
-        found.xid
-      );
-
-    } else {
-
-      $("ocrStatus").textContent =
-        "⚠️ X IDを自動認識できませんでした。下の入力欄に入力してください。";
-
-      showReview(
-        found.name || "",
-        ""
-      );
-
-    }
-
-  } catch(err){
-
-    console.error("OCR ERROR:", err);
-
-    $("ocrStatus").textContent =
-      "⚠️ 自動認識に失敗しました。名前とX IDを手入力してください。";
-
-    showReview("", "");
-
+  if(!Array.isArray(users)){
+    users = [];
   }
+
+}catch(e){
+
+  users = [];
 
 }
 
 
-/*
- * OCR文字列からXプロフィール情報を探す
- */
-function detectXProfile(text){
+const $ = id =>
+  document.getElementById(id);
 
-  const lines = String(text || "")
-    .split(/\r?\n/)
-    .map(x => x.trim())
-    .filter(Boolean);
 
-  let xid = "";
-  let name = "";
+function save(){
 
-  /*
-   * @ユーザー名を最優先で探す
-   */
-  for(const line of lines){
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(users)
+  );
 
-    const match =
-      line.match(/@([A-Za-z0-9_]{2,15})/);
-
-    if(match){
-
-      xid = "@" + match[1];
-
-      const index = lines.indexOf(line);
-
-      if(index > 0){
-        name = lines[index - 1];
-      }
-
-      break;
-    }
-
-  }
-
-  /*
-   * @が読み取れなかった場合
-   * 英数字だけのX ID候補を探す
-   */
-  if(!xid){
-
-    for(const line of lines){
-
-      const cleaned =
-        line
-          .replace(/[＠﹫]/g, "@")
-          .replace(/\s/g, "");
-
-      const match =
-        cleaned.match(
-          /(?:^|[^A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]{2,14})(?:$|[^A-Za-z0-9_])/
-        );
-
-      if(match){
-
-        const candidate =
-          cleanXid(match[1]);
-
-        if(candidate){
-
-          /*
-           * 一般的なUI文字を除外
-           */
-          const bad = [
-            "follow",
-            "following",
-            "followers",
-            "profile",
-            "twitter",
-            "account",
-            "x",
-            "japan"
-          ];
-
-          if(!bad.includes(match[1].toLowerCase())){
-
-            xid = candidate;
-
-            const index =
-              lines.indexOf(line);
-
-            if(index > 0){
-              name = lines[index - 1];
-            }
-
-            break;
-
-          }
-
-        }
-
-      }
-
-    }
-
-  }
-
-  /*
-   * 名前が取れなかった場合
-   * 最初の短い日本語行を候補にする
-   */
-  if(!name){
-
-    for(const line of lines){
-
-      if(
-        line.length >= 1 &&
-        line.length <= 30 &&
-        !/@/.test(line) &&
-        !/https?:\/\//.test(line)
-      ){
-
-        name = line;
-        break;
-
-      }
-
-    }
-
-  }
-
-  return {
-    name: name.trim(),
-    xid
-  };
+  render();
 
 }
 
 
-/*
- * 写真が選択されたとき
- */
-$("photo").addEventListener(
-  "change",
-  async e => {
+function cleanXid(value){
 
-    const file =
-      e.target.files?.[0];
+  let x =
+    String(value || "").trim();
 
-    if(!file){
-      return;
-    }
+  x =
+    x.replace(
+      /[＠﹫]/g,
+      "@"
+    );
 
-    /*
-     * プレビュー表示
-     */
-    const preview =
-      $("preview");
+  if(
+    x &&
+    !x.startsWith("@")
+  ){
 
-    preview.src =
-      URL.createObjectURL(file);
-
-    preview.style.display =
-      "block";
-
-    /*
-     * OCR開始
-     */
-    await runOCR(file);
+    x =
+      "@" +
+      x.slice(0,15);
 
   }
-);
+
+  return x;
+
+}
 
 
-/*
- * 登録
- */
-$("register").addEventListener(
+function esc(s){
+
+  return String(
+    s ?? ""
+  ).replace(
+    /[&<>"']/g,
+    c => ({
+
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+
+    }[c])
+  );
+
+}
+
+
+function render(){
+
+  const q =
+    $("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const shown =
+    users.filter(u =>
+      `${u.name} ${u.xid} ${u.memo}`
+        .toLowerCase()
+        .includes(q)
+    );
+
+
+  $("total").textContent =
+    users.length;
+
+
+  $("given").textContent =
+    users.filter(
+      u => u.given
+    ).length;
+
+
+  if(!shown.length){
+
+    $("list").innerHTML =
+      '<div class="empty">まだ登録されていません</div>';
+
+    return;
+
+  }
+
+
+  $("list").innerHTML =
+    shown.map(u => `
+
+      <div class="item">
+
+        <div class="avatar">
+          ${esc(
+            (u.name || "?")
+              .slice(0,1)
+          )}
+        </div>
+
+        <div class="info">
+
+          <div class="name">
+            ${esc(u.name)}
+          </div>
+
+          <div class="id">
+            ${esc(u.xid)}
+          </div>
+
+          <div class="meta">
+            ${esc(u.memo || "")}
+            ${esc(u.date || "")}
+          </div>
+
+        </div>
+
+        <span class="badge">
+          ✓ 配布済み
+        </span>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+$("register")
+.addEventListener(
   "click",
   () => {
 
-    let name =
-      $("name").value.trim();
+    const name =
+      $("name")
+        .value
+        .trim();
 
-    let xid =
-      cleanXid($("xid").value);
+
+    const xid =
+      cleanXid(
+        $("xid").value
+      );
+
 
     const memo =
-      $("memo").value.trim();
+      $("memo")
+        .value
+        .trim();
 
-    if(!name || !xid){
+
+    if(
+      !name ||
+      !xid
+    ){
 
       alert(
-        "名前とX IDを確認してください"
+        "名前とX IDを入力してください"
       );
 
       return;
 
     }
 
-    /*
-     * 既存X IDを探す
-     */
+
     const old =
       users.find(
         u =>
-          String(u.xid || "")
+          String(u.xid)
             .toLowerCase() ===
           xid.toLowerCase()
       );
 
+
     if(old){
 
-      if(old.given){
+      alert(
+        "このX IDはすでに登録されています。"
+      );
 
-        alert(
-          "このX IDはすでに配布済みです。二重配布を防止しました。"
-        );
-
-        return;
-
-      }
-
-      old.name = name;
-      old.memo = memo;
-      old.given = true;
-      old.givenAt =
-        new Date().toLocaleString("ja-JP");
-
-    }else{
-
-      users.unshift({
-
-        id:
-          Date.now().toString(),
-
-        name,
-
-        xid,
-
-        memo,
-
-        given: true,
-
-        date:
-          new Date().toLocaleDateString("ja-JP"),
-
-        givenAt:
-          new Date().toLocaleString("ja-JP")
-
-      });
+      return;
 
     }
 
+
+    users.unshift({
+
+      id:
+        Date.now().toString(),
+
+      name,
+
+      xid,
+
+      memo,
+
+      given:true,
+
+      date:
+        new Date()
+          .toLocaleString("ja-JP")
+
+    });
+
+
     save();
 
-    $("review").style.display =
-      "none";
 
-    $("photo").value = "";
+    $("name").value =
+      "";
 
-    $("preview").style.display =
-      "none";
+    $("xid").value =
+      "";
 
-    $("preview").src = "";
+    $("memo").value =
+      "";
 
-    $("memo").value = "";
-
-    $("ocrStatus").textContent =
-      "🎖️ 配布済みとして登録しました！";
 
     alert(
       "🎖️ 配布済みとして登録しました！"
@@ -572,50 +380,48 @@ $("register").addEventListener(
 );
 
 
-/*
- * 撮り直す
- */
-$("reset").addEventListener(
-  "click",
-  () => {
-
-    $("review").style.display =
-      "none";
-
-    $("photo").value = "";
-
-    $("preview").style.display =
-      "none";
-
-    $("preview").src = "";
-
-    $("name").value = "";
-
-    $("xid").value = "";
-
-    $("memo").value = "";
-
-    $("ocrStatus").textContent =
-      "写真を撮ると自動認識を開始します。";
-
-  }
-);
-
-
-/*
- * 検索
- */
-$("search").addEventListener(
+$("search")
+.addEventListener(
   "input",
   render
 );
 
 
-/*
- * 初期表示
- */
+$("clearAll")
+.addEventListener(
+  "click",
+  () => {
+
+    if(!users.length){
+
+      alert(
+        "削除するデータがありません"
+      );
+
+      return;
+
+    }
+
+
+    if(
+      confirm(
+        "登録データをすべて削除しますか？"
+      )
+    ){
+
+      users = [];
+
+      save();
+
+    }
+
+  }
+);
+
+
 render();
 
 </script>
+
 </body>
 </html>
