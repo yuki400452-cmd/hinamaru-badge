@@ -92,154 +92,297 @@ function showReview(name,xid){
 }
 
 function detect(text){
-  const lines=text
+  // OCR文字を整える
+  const normalized = String(text ?? "")
+    .replace(/[＠﹫]/g, "@")
+    .replace(/[｜|]/g, "I")
+    .replace(/[‐-‒–—−]/g, "-")
+    .replace(/\u00a0/g, " ");
+
+  const lines = normalized
     .split(/\r?\n/)
-    .map(s=>s.trim())
+    .map(s => s.trim())
     .filter(Boolean);
 
-  // X IDを探す
-  const matches=[
-    ...text.matchAll(/@[A-Za-z0-9_]{1,15}/g)
+  // -------------------------
+  // X ID（@ユーザー名）を探す
+  // -------------------------
+  const xidMatches = [
+    ...normalized.matchAll(
+      /@[A-Za-z0-9_]{1,15}/g
+    )
   ];
 
-  const xid=matches.length ? matches[0][0] : "";
+  let xid = xidMatches.length
+    ? xidMatches[0][0]
+    : "";
 
-  let nameLine="";
-
-  // X IDの直前にある名前を探す
-  if(xid){
-    const idIndex=lines.findIndex(
-      line=>line.includes(xid)
+  // OCRで @ が落ちた場合にも対応
+  if(!xid){
+    const noAt = normalized.match(
+      /(?:^|\s)([A-Za-z0-9_]{1,15})(?:\s|$)/m
     );
 
-    if(idIndex>0){
-      for(
-        let i=idIndex-1;
-        i>=Math.max(0,idIndex-5);
-        i--
-      ){
-        const candidate=lines[i];
+    if(noAt){
+      const candidate = noAt[1];
 
-        if(
-          candidate &&
-          candidate.length<=30 &&
-          !candidate.startsWith("@") &&
-          !candidate.includes("フォロー") &&
-          !candidate.includes("フォロワー") &&
-          !candidate.includes("フォロー中") &&
-          !candidate.match(/\d{3,}/)
-        ){
-          nameLine=candidate;
-          break;
-        }
+      // よくある誤認識・UI文字を除外
+      const badWords = [
+        "follow",
+        "followers",
+        "following",
+        "posts",
+        "post",
+        "reply",
+        "likes",
+        "media",
+        "home",
+        "search",
+        "通知",
+        "フォロー",
+        "フォロワー",
+        "フォロー中"
+      ];
+
+      if(
+        candidate.length >= 2 &&
+        !badWords.some(w =>
+          candidate.toLowerCase() === w.toLowerCase()
+        )
+      ){
+        xid = "@" + candidate;
       }
     }
   }
 
-  // 名前が見つからなかった場合
-  if(!nameLine){
-    nameLine=lines.find(line=>
-      line.length<=20 &&
-      !line.startsWith("@") &&
-      !line.includes("フォロー") &&
-      !line.includes("フォロワー") &&
-      !line.includes("フォロー中") &&
-      !line.match(/\d{4}/)
-    )||"";
+  // -------------------------
+  // X IDの位置を探す
+  // -------------------------
+  let idIndex = -1;
+
+  if(xid){
+    idIndex = lines.findIndex(line =>
+      line.includes(xid.replace(/^@/,"")) ||
+      line.includes(xid)
+    );
   }
 
-  showReview(nameLine,xid);
+  // -------------------------
+  // 名前を探す
+  // X IDの直前にある短い文字列を優先
+  // -------------------------
+  let nameLine = "";
 
-  return{
-    name:nameLine,
-    xid:xid
+  if(idIndex > 0){
+
+    for(let i = idIndex - 1; i >= Math.max(0,idIndex - 4); i--){
+
+      const candidate = lines[i];
+
+      if(!candidate) continue;
+
+      // @から始まるものはIDなので除外
+      if(candidate.startsWith("@")) continue;
+
+      // UI文字を除外
+      if(
+        candidate.includes("フォロー") ||
+        candidate.includes("フォロワー") ||
+        candidate.includes("フォロー中") ||
+        candidate.includes("返信") ||
+        candidate.includes("投稿") ||
+        candidate.includes("いいね")
+      ) continue;
+
+      // 数字だけは除外
+      if(/^\d+$/.test(candidate)) continue;
+
+      // 日付・時刻っぽいものを除外
+      if(/^\d{1,4}[:/.-]\d{1,2}/.test(candidate)) continue;
+
+      // URLを除外
+      if(/https?:\/\//i.test(candidate)) continue;
+
+      // 長すぎる文章は除外
+      if(candidate.length > 40) continue;
+
+      nameLine = candidate;
+      break;
+    }
+  }
+
+  // -------------------------
+  // IDが見つからない場合
+  // 名前だけでも候補を探す
+  // -------------------------
+  if(!nameLine){
+
+    nameLine = lines.find(line => {
+
+      if(line.startsWith("@")) return false;
+
+      if(line.length < 1 || line.length > 20) return false;
+
+      if(line.includes("フォロー")) return false;
+      if(line.includes("フォロワー")) return false;
+      if(line.includes("フォロー中")) return false;
+      if(line.includes("返信")) return false;
+      if(line.includes("投稿")) return false;
+      if(line.includes("いいね")) return false;
+
+      if(/https?:\/\//i.test(line)) return false;
+
+      if(/^\d+$/.test(line)) return false;
+
+      return true;
+    }) || "";
+  }
+
+  // -------------------------
+  // 結果を画面に表示
+  // -------------------------
+  showReview(nameLine, xid);
+
+  return {
+    name: nameLine,
+    xid: xid
   };
 }
 
 
+// ================================
 // 写真を選択・撮影したとき
-$("photo").addEventListener("change",async e=>{
+// OCR強化版
+// ================================
+$("photo").addEventListener("change", async (e) => {
 
-  const file=e.target.files?.[0];
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-  if(!file)return;
+  const preview = $("preview");
+  const ocrStatus = $("ocrStatus");
 
-  $("preview").src=URL.createObjectURL(file);
-  $("preview").style.display="block";
+  // プレビュー表示
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
 
-  $("ocrStatus").textContent="🔍 写真を解析中…";
+  ocrStatus.textContent = "🔍 写真を解析しています…";
 
-  try{
+  try {
 
-    // Tesseractが読み込まれていなければ読み込む
-    if(!window.Tesseract){
+    // --------------------------------
+    // Tesseract.js を読み込む
+    // --------------------------------
+    if (!window.Tesseract) {
 
-      await new Promise((resolve,reject)=>{
+      await new Promise((resolve, reject) => {
 
-        const s=document.createElement("script");
+        const script = document.createElement("script");
 
-        s.src=
+        script.src =
           "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
 
-        s.onload=resolve;
-        s.onerror=reject;
+        script.onload = resolve;
+        script.onerror = reject;
 
-        document.head.appendChild(s);
+        document.head.appendChild(script);
 
       });
 
     }
 
-    $("ocrStatus").textContent=
-      "🔍 文字認識エンジンを起動中…";
+    // --------------------------------
+    // OCR開始
+    // --------------------------------
+    ocrStatus.textContent =
+      "🔍 Xプロフィールを自動認識中…";
 
-    const result=await Tesseract.recognize(
+    const result = await Tesseract.recognize(
       file,
       "jpn+eng",
       {
-        logger:m=>{
+        logger: m => {
 
-          if(m.status==="recognizing text"){
+          if (m.status === "recognizing text") {
 
-            const percent=Math.round(
-              (m.progress||0)*100
-            );
+            const percent =
+              Math.round((m.progress || 0) * 100);
 
-            $("ocrStatus").textContent=
+            ocrStatus.textContent =
               `🔍 文字を認識中… ${percent}%`;
+
           }
 
         }
       }
     );
 
-    const found=detect(result.data.text);
+    // --------------------------------
+    // OCR結果
+    // --------------------------------
+    const text = result?.data?.text || "";
 
-    if(found.xid){
+    console.log("===== OCR RESULT =====");
+    console.log(text);
+    console.log("======================");
 
-      $("ocrStatus").innerHTML=
-        '<span class="ok">✓ X IDを認識しました。内容を確認してください。</span>';
+    if (!text.trim()) {
 
-    }else{
+      ocrStatus.textContent =
+        "⚠️ 文字を読み取れませんでした";
 
-      $("ocrStatus").textContent=
-        "⚠️ @から始まるX IDを認識できませんでした。写真を撮り直すか手入力してください。";
+      showReview("", "");
+
+      return;
+    }
+
+    // --------------------------------
+    // detect() に渡す
+    // --------------------------------
+    const found = detect(text);
+
+    // --------------------------------
+    // X IDを発見
+    // --------------------------------
+    if (found && found.xid) {
+
+      ocrStatus.innerHTML =
+        `<span class="ok">✓ X IDを認識しました</span>`;
+
+      showReview(
+        found.name || "",
+        found.xid || ""
+      );
 
     }
 
-  }catch(err){
+    // --------------------------------
+    // X IDが見つからない
+    // --------------------------------
+    else {
 
-    console.error("OCR error:",err);
+      ocrStatus.textContent =
+        "⚠️ X IDを認識できませんでした。プロフィール画面全体が写るように撮影してください。";
 
-    $("ocrStatus").textContent=
-      "⚠️ 自動認識を起動できませんでした。X IDと名前を手入力してください。";
+      showReview(
+        found?.name || "",
+        ""
+      );
 
-    showReview("","");
+    }
+
+  } catch (err) {
+
+    console.error("OCR error:", err);
+
+    ocrStatus.textContent =
+      "⚠️ 自動認識に失敗しました。もう一度撮影してください。";
+
+    showReview("", "");
 
   }
 
 });
-
 
 // 配布済みに登録
 $("register").addEventListener("click",()=>{
