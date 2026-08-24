@@ -1,17 +1,23 @@
 <!doctype html>
 <html lang="ja">
 <head>
-
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="apple-touch-icon" href="./hinamaru_icon_180.png">
+
 <title>ひなまる隊｜缶バッジ配布管理</title>
+
 <style>
 :root{
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",
-  "Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",
+  "Helvetica Neue",Meiryo,sans-serif;
   color:#202124;
 }
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -21,24 +27,23 @@ body{
 header{
   background:linear-gradient(135deg,#008f7a,#19b99e);
   color:white;
-  padding:28px 20px 24px;
+  padding:24px 18px 22px;
 }
 
 header h1{
-  margin:0 0 8px;
-  font-size:25px;
+  margin:0 0 6px;
+  font-size:24px;
 }
 
 header p{
   margin:0;
   font-size:14px;
-  opacity:.95;
 }
 
 main{
-  max-width:720px;
+  max-width:700px;
   margin:auto;
-  padding:18px;
+  padding:16px;
 }
 
 .stats{
@@ -58,62 +63,51 @@ main{
 
 .stat strong{
   display:block;
-  font-size:30px;
+  font-size:27px;
 }
 
 .stat span{
+  color:#687074;
   font-size:13px;
-  color:#687574;
 }
 
 .card{
   background:white;
   border-radius:20px;
-  padding:20px;
+  padding:18px;
   margin-bottom:16px;
-  box-shadow:0 3px 12px #0000000d;
+  box-shadow:0 3px 14px #0000000d;
 }
 
-h2{
-  font-size:19px;
-  margin:0 0 16px;
+.card h2{
+  margin:0 0 14px;
+  font-size:18px;
 }
 
 label{
   display:block;
-  font-weight:700;
-  margin:14px 0 7px;
+  margin:12px 0 6px;
+  font-weight:bold;
+  font-size:14px;
 }
 
-input,textarea{
+input{
   width:100%;
-  border:1px solid #d7dfdd;
-  border-radius:12px;
   padding:14px;
+  border:1px solid #d5dcda;
+  border-radius:12px;
   font-size:16px;
   background:#fff;
 }
 
-textarea{
-  min-height:90px;
-  resize:vertical;
-}
-
-.buttons{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
-
 button{
-  flex:1;
-  min-width:130px;
+  width:100%;
   border:0;
   border-radius:12px;
   padding:14px;
   font-size:16px;
-  font-weight:700;
+  font-weight:bold;
+  margin-top:12px;
   cursor:pointer;
 }
 
@@ -124,80 +118,76 @@ button{
 
 .secondary{
   background:#eef3f2;
-  color:#333;
+  color:#202124;
 }
 
-.danger{
-  background:#fff0f0;
-  color:#c62828;
-}
-
-.status{
-  margin-top:12px;
-  min-height:22px;
-  font-size:14px;
-  color:#087e6c;
-  font-weight:700;
-}
-
-.search{
-  margin-bottom:12px;
-}
-
-.item{
-  border:1px solid #e0e6e4;
+.user{
+  border:1px solid #e0e5e3;
   border-radius:14px;
   padding:14px;
   margin-top:10px;
 }
 
-.item-head{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:center;
-}
-
-.item-name{
+.user-name{
   font-size:17px;
-  font-weight:800;
+  font-weight:bold;
 }
 
-.item-xid{
-  color:#087e6c;
-  font-weight:700;
+.user-xid{
+  color:#008f7a;
+  margin-top:3px;
 }
 
-.badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  background:#e6f7f3;
-  color:#087e6c;
-  font-size:12px;
-  font-weight:700;
-}
-
-.item-meta{
-  margin-top:8px;
-  color:#687574;
+.user-memo{
+  color:#687074;
   font-size:13px;
-  white-space:pre-wrap;
+  margin-top:6px;
+}
+
+.user-status{
+  margin-top:10px;
+  font-weight:bold;
+}
+
+.given{
+  color:#008f7a;
+}
+
+.notgiven{
+  color:#e67e22;
 }
 
 .empty{
   text-align:center;
-  color:#687574;
-  padding:20px 5px;
+  color:#8a9290;
+  padding:20px 0;
+}
+
+.notice{
+  background:#f0faf7;
+  border-radius:12px;
+  padding:12px;
+  font-size:13px;
+  color:#087c6b;
+  margin-top:10px;
 }
 
 @media(max-width:500px){
-  main{padding:12px}
-  header{padding:22px 16px}
-  header h1{font-size:22px}
-  .stats{gap:7px}
-  .stat{padding:13px 5px}
-  .stat strong{font-size:26px}
+  main{
+    padding:12px;
+  }
+
+  .stats{
+    gap:7px;
+  }
+
+  .stat{
+    padding:13px 5px;
+  }
+
+  .stat strong{
+    font-size:24px;
+  }
 }
 </style>
 </head>
@@ -205,13 +195,12 @@ button{
 <body>
 
 <header>
-  <h1>🎖️ ひなまる隊｜缶バッジ配布管理</h1>
-  <p>名前とX IDを入力して、配布状況を管理します</p>
+  <h1>🏅 ひなまる隊 缶バッジ配布管理</h1>
+  <p>名前とX IDを入力して配布状況を管理します</p>
 </header>
 
 <main>
 
-  <!-- 統計 -->
   <section class="stats">
     <div class="stat">
       <strong id="total">0</strong>
@@ -219,26 +208,24 @@ button{
     </div>
 
     <div class="stat">
-      <strong id="given">0</strong>
+      <strong id="givenCount">0</strong>
       <span>配布済み</span>
     </div>
 
     <div class="stat">
-      <strong id="notGiven">0</strong>
+      <strong id="remaining">0</strong>
       <span>未配布</span>
     </div>
   </section>
 
-  <!-- 登録 -->
   <section class="card">
-
-    <h2>👤 配布ユーザー登録</h2>
+    <h2>📝 配布ユーザーを登録</h2>
 
     <label for="name">名前</label>
     <input
       id="name"
       type="text"
-      placeholder="名前を入力してください"
+      placeholder="例：ひなちゃん"
       autocomplete="off"
     >
 
@@ -246,44 +233,42 @@ button{
     <input
       id="xid"
       type="text"
-      placeholder="@ユーザー名を入力してください"
+      placeholder="例：@example"
       autocomplete="off"
     >
 
     <label for="memo">メモ（任意）</label>
-    <textarea
+    <input
       id="memo"
-      placeholder="必要ならメモを入力してください"
-    ></textarea>
+      type="text"
+      placeholder="例：京都ミーグリ"
+      autocomplete="off"
+    >
 
-    <div class="buttons">
-      <button class="primary" id="register">
-        🎖️ 配布済みとして登録
-      </button>
+    <button class="primary" id="register">
+      🏅 配布済みとして登録
+    </button>
 
-      <button class="secondary" id="clear">
-        クリア
-      </button>
+    <button class="secondary" id="registerNotGiven">
+      未配布として登録
+    </button>
+
+    <div class="notice">
+      ※ X IDは「example」と入力しても自動で「@example」にします。
     </div>
-
-    <div class="status" id="status"></div>
-
   </section>
 
-  <!-- 検索 -->
   <section class="card">
-
-    <h2>🔎 登録ユーザー検索</h2>
+    <h2>🔎 配布ユーザー</h2>
 
     <input
-      class="search"
       id="search"
-      type="search"
+      type="text"
       placeholder="名前・@ID・メモで検索"
+      autocomplete="off"
     >
 
     <div id="list"></div>
-
   </section>
 
 </main>
@@ -292,57 +277,38 @@ button{
 
 const STORAGE_KEY = "hinamaru_users_v1";
 
-let users = loadUsers();
+let users = [];
 
-function loadUsers(){
+function load(){
   try{
-    const data = localStorage.getItem(STORAGE_KEY);
-
-    if(!data){
-      return [];
-    }
-
-    const parsed = JSON.parse(data);
-
-    return Array.isArray(parsed) ? parsed : [];
-
-  }catch(error){
-
-    console.error(error);
-
-    return [];
+    users = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) || "[]"
+    );
+  }catch(e){
+    users = [];
   }
 }
 
-function saveUsers(){
-
+function save(){
   localStorage.setItem(
     STORAGE_KEY,
     JSON.stringify(users)
   );
-
 }
 
-function normalizeXid(value){
+function normalizeXid(xid){
 
-  let xid = value.trim();
+  xid = xid.trim();
 
-  if(xid && !xid.startsWith("@")){
+  if(!xid){
+    return "";
+  }
+
+  if(!xid.startsWith("@")){
     xid = "@" + xid;
   }
 
   return xid;
-}
-
-function escapeHTML(value){
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
 }
 
 function updateStats(){
@@ -350,260 +316,181 @@ function updateStats(){
   const total = users.length;
 
   const given = users.filter(
-    user => user.given === true
+    user => user.given
   ).length;
 
-  const notGiven = total - given;
-
   document.getElementById("total").textContent = total;
-  document.getElementById("given").textContent = given;
-  document.getElementById("notGiven").textContent = notGiven;
-
+  document.getElementById("givenCount").textContent = given;
+  document.getElementById("remaining").textContent =
+    total - given;
 }
 
 function render(){
 
-  updateStats();
-
   const keyword =
-    document
-      .getElementById("search")
+    document.getElementById("search")
       .value
       .trim()
       .toLowerCase();
 
-  let filtered = users;
+  const list =
+    document.getElementById("list");
 
-  if(keyword){
+  list.innerHTML = "";
 
-    filtered = users.filter(user => {
+  const filtered = users.filter(user => {
 
-      return (
-        user.name.toLowerCase().includes(keyword) ||
-        user.xid.toLowerCase().includes(keyword) ||
-        user.memo.toLowerCase().includes(keyword)
-      );
+    const text = [
+      user.name,
+      user.xid,
+      user.memo
+    ]
+    .join(" ")
+    .toLowerCase();
 
-    });
-
-  }
-
-  const list = document.getElementById("list");
+    return text.includes(keyword);
+  });
 
   if(filtered.length === 0){
 
     list.innerHTML =
       '<div class="empty">登録ユーザーはいません</div>';
 
+    updateStats();
     return;
   }
 
-  list.innerHTML = filtered.map(user => {
+  filtered.forEach(user => {
 
-    const date =
-      user.givenAt || user.createdAt || "";
+    const div =
+      document.createElement("div");
 
-    return `
-      <div class="item">
+    div.className = "user";
 
-        <div class="item-head">
-
-          <div>
-            <div class="item-name">
-              ${escapeHTML(user.name)}
-            </div>
-
-            <div class="item-xid">
-              ${escapeHTML(user.xid)}
-            </div>
-          </div>
-
-          <span class="badge">
-            ${user.given ? "配布済み" : "未配布"}
-          </span>
-
-        </div>
-
-        ${
-          user.memo
-          ? `<div class="item-meta">
-               📝 ${escapeHTML(user.memo)}
-             </div>`
-          : ""
-        }
-
-        ${
-          date
-          ? `<div class="item-meta">
-               登録日時：${escapeHTML(date)}
-             </div>`
-          : ""
-        }
-
-        <div class="buttons">
-
-          <button
-            class="secondary"
-            onclick="toggleGiven('${user.id}')"
-          >
-            ${
-              user.given
-              ? "未配布に戻す"
-              : "配布済みにする"
-            }
-          </button>
-
-          <button
-            class="danger"
-            onclick="deleteUser('${user.id}')"
-          >
-            削除
-          </button>
-
-        </div>
-
+    div.innerHTML = `
+      <div class="user-name">
+        ${escapeHtml(user.name)}
       </div>
-    `;
 
-  }).join("");
+      <div class="user-xid">
+        ${escapeHtml(user.xid)}
+      </div>
 
-}
-
-function showStatus(message){
-
-  const status =
-    document.getElementById("status");
-
-  status.textContent = message;
-
-  setTimeout(() => {
-
-    status.textContent = "";
-
-  },3000);
-
-}
-
-document
-  .getElementById("register")
-  .addEventListener("click",() => {
-
-    const name =
-      document
-        .getElementById("name")
-        .value
-        .trim();
-
-    let xid =
-      normalizeXid(
-        document
-          .getElementById("xid")
-          .value
-      );
-
-    const memo =
-      document
-        .getElementById("memo")
-        .value
-        .trim();
-
-    if(!name || !xid){
-
-      alert("名前とX IDを入力してください");
-
-      return;
-    }
-
-    if(xid === "@"){
-
-      alert("X IDを入力してください");
-
-      return;
-    }
-
-    const old =
-      users.find(
-        user =>
-          user.xid.toLowerCase() === xid.toLowerCase()
-      );
-
-    if(old){
-
-      if(old.given){
-
-        alert(
-          "このX IDはすでに配布済みです。"
-        );
-
-        return;
+      ${
+        user.memo
+        ? `<div class="user-memo">
+             ${escapeHtml(user.memo)}
+           </div>`
+        : ""
       }
 
-      old.name = name;
-      old.memo = memo;
-      old.given = true;
-      old.givenAt =
-        new Date().toLocaleString("ja-JP");
+      <div class="user-status ${
+        user.given ? "given" : "notgiven"
+      }">
+        ${user.given ? "🏅 配布済み" : "⏳ 未配布"}
+      </div>
 
-      saveUsers();
+      <button
+        class="secondary"
+        onclick="toggleGiven('${user.id}')"
+      >
+        ${user.given ? "未配布に戻す" : "配布済みにする"}
+      </button>
 
-      showStatus(
-        "🎖️ 配布済みとして登録しました！"
-      );
+      <button
+        class="secondary"
+        onclick="deleteUser('${user.id}')"
+      >
+        🗑 削除
+      </button>
+    `;
 
-    }else{
+    list.appendChild(div);
+  });
 
-      users.unshift({
+  updateStats();
+}
 
-        id:
-          Date.now().toString(),
+function escapeHtml(text){
 
-        name:name,
+  return String(text)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
-        xid:xid,
+function register(given){
 
-        memo:memo,
+  const name =
+    document.getElementById("name")
+      .value
+      .trim();
 
-        given:true,
+  const xid =
+    normalizeXid(
+      document.getElementById("xid").value
+    );
 
-        createdAt:
-          new Date().toLocaleString("ja-JP"),
+  const memo =
+    document.getElementById("memo")
+      .value
+      .trim();
 
-        givenAt:
-          new Date().toLocaleString("ja-JP")
+  if(!name || !xid){
 
-      });
+    alert("名前とX IDを入力してください。");
+    return;
+  }
 
-      saveUsers();
+  const exists =
+    users.find(
+      user =>
+        user.xid.toLowerCase() ===
+        xid.toLowerCase()
+    );
 
-      showStatus(
-        "🎖️ 配布済みとして登録しました！"
-      );
+  if(exists){
 
-    }
+    alert(
+      "このX IDはすでに登録されています。"
+    );
 
-    document.getElementById("name").value = "";
-    document.getElementById("xid").value = "";
-    document.getElementById("memo").value = "";
+    return;
+  }
 
-    render();
+  users.unshift({
+
+    id:
+      Date.now().toString() +
+      Math.random()
+        .toString(36)
+        .slice(2),
+
+    name:name,
+    xid:xid,
+    memo:memo,
+    given:given,
+    createdAt:
+      new Date().toLocaleString("ja-JP")
 
   });
 
-document
-  .getElementById("clear")
-  .addEventListener("click",() => {
+  save();
 
-    document.getElementById("name").value = "";
-    document.getElementById("xid").value = "";
-    document.getElementById("memo").value = "";
+  document.getElementById("name").value = "";
+  document.getElementById("xid").value = "";
+  document.getElementById("memo").value = "";
 
-    document.getElementById("status").textContent = "";
+  render();
 
-  });
-
-document
-  .getElementById("search")
-  .addEventListener("input",render);
+  alert(
+    given
+      ? "🏅 配布済みとして登録しました！"
+      : "登録しました！"
+  );
+}
 
 function toggleGiven(id){
 
@@ -612,27 +499,12 @@ function toggleGiven(id){
       user => user.id === id
     );
 
-  if(!user){
-    return;
-  }
+  if(!user) return;
 
   user.given = !user.given;
 
-  if(user.given){
-
-    user.givenAt =
-      new Date().toLocaleString("ja-JP");
-
-  }else{
-
-    user.givenAt = "";
-
-  }
-
-  saveUsers();
-
+  save();
   render();
-
 }
 
 function deleteUser(id){
@@ -642,16 +514,13 @@ function deleteUser(id){
       user => user.id === id
     );
 
-  if(!user){
-    return;
-  }
+  if(!user) return;
 
-  const ok =
-    confirm(
+  if(
+    !confirm(
       `${user.name}（${user.xid}）を削除しますか？`
-    );
-
-  if(!ok){
+    )
+  ){
     return;
   }
 
@@ -660,12 +529,32 @@ function deleteUser(id){
       user => user.id !== id
     );
 
-  saveUsers();
-
+  save();
   render();
-
 }
 
+document
+  .getElementById("register")
+  .addEventListener(
+    "click",
+    () => register(true)
+  );
+
+document
+  .getElementById("registerNotGiven")
+  .addEventListener(
+    "click",
+    () => register(false)
+  );
+
+document
+  .getElementById("search")
+  .addEventListener(
+    "input",
+    render
+  );
+
+load();
 render();
 
 </script>
