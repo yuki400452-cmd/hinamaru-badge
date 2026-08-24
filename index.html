@@ -82,94 +82,253 @@ function render(){
  <span class="badge">${u.given?"✓ 配布済み":"未配布"}</span></div>`).join(""):'<div class="empty">まだ登録されたユーザーはいません</div>';
 }
 function showReview(name,xid){
- $("name").value=name||"";$("xid").value=xid||"";$("review").style.display="block";
- $("review").scrollIntoView({behavior:"smooth",block:"function detect(text){
-  function detect(text){
-                             const lines = text
+  $("name").value=name||"";
+  $("xid").value=xid||"";
+  $("review").style.display="block";
+  $("review").scrollIntoView({
+    behavior:"smooth",
+    block:"center"
+  });
+}
+
+function detect(text){
+  const lines=text
     .split(/\r?\n/)
-    .map(s => s.trim())
+    .map(s=>s.trim())
     .filter(Boolean);
 
-  const matches = [...text.matchAll(/@[A-Za-z0-9_]{1,15}/g)];
-  const xid = matches.length ? matches[0][0] : "";
+  // X IDを探す
+  const matches=[
+    ...text.matchAll(/@[A-Za-z0-9_]{1,15}/g)
+  ];
 
-  let nameLine = "";
+  const xid=matches.length ? matches[0][0] : "";
 
-  if (xid) {
-    const idIndex = lines.findIndex(line => line.includes(xid));
+  let nameLine="";
 
-    if (idIndex > 0) {
-      for (let i = idIndex - 1; i >= Math.max(0, idIndex - 5); i--) {
-        const candidate = lines[i];
+  // X IDの直前にある名前を探す
+  if(xid){
+    const idIndex=lines.findIndex(
+      line=>line.includes(xid)
+    );
 
-        if (
+    if(idIndex>0){
+      for(
+        let i=idIndex-1;
+        i>=Math.max(0,idIndex-5);
+        i--
+      ){
+        const candidate=lines[i];
+
+        if(
           candidate &&
-          candidate.length <= 30 &&
+          candidate.length<=30 &&
           !candidate.startsWith("@") &&
           !candidate.includes("フォロー") &&
           !candidate.includes("フォロワー") &&
           !candidate.includes("フォロー中") &&
           !candidate.match(/\d{3,}/)
-        ) {
-          nameLine = candidate;
+        ){
+          nameLine=candidate;
           break;
         }
       }
     }
   }
 
-  if (!nameLine) {
-    nameLine = lines.find(line =>
-      line.length <= 20 &&
+  // 名前が見つからなかった場合
+  if(!nameLine){
+    nameLine=lines.find(line=>
+      line.length<=20 &&
       !line.startsWith("@") &&
       !line.includes("フォロー") &&
       !line.includes("フォロワー") &&
       !line.includes("フォロー中") &&
       !line.match(/\d{4}/)
-    ) || "";
+    )||"";
   }
 
-  showReview(nameLine, xid);
-  return {name:nameLine, xid:xid};
+  showReview(nameLine,xid);
+
+  return{
+    name:nameLine,
+    xid:xid
+  };
 }
 
+
+// 写真を選択・撮影したとき
 $("photo").addEventListener("change",async e=>{
- const file=e.target.files?.[0];if(!file)return;
- $("preview").src=URL.createObjectURL(file);$("preview").style.display="block";
- $("ocrStatus").textContent="🔍 写真を解析中…";
- try{
-   if(!window.Tesseract){
-     await new Promise((resolve,reject)=>{
-       const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
-     });
-   }
-   const result=await Tesseract.recognize(file,"jpn+eng",{logger:m=>{
-     if(m.status==="recognizing text") $("ocrStatus").textContent=`🔍 文字を認識中… ${Math.round((m.progress||0)*100)}%`;
-   }});
-   const found=detect(result.data.text);
-   if(found.xid) $("ocrStatus").innerHTML='<span class="ok">✓ X IDを認識しました。内容を確認してください。</span>';
-   else $("ocrStatus").textContent="⚠️ @から始まるX IDを認識できませんでした。写真を撮り直すか手入力してください。";
- }catch(err){
-   $("ocrStatus").textContent="⚠️ 自動認識を起動できませんでした。X IDと名前を手入力できます。";
-   showReview("","");
- }
+
+  const file=e.target.files?.[0];
+
+  if(!file)return;
+
+  $("preview").src=URL.createObjectURL(file);
+  $("preview").style.display="block";
+
+  $("ocrStatus").textContent="🔍 写真を解析中…";
+
+  try{
+
+    // Tesseractが読み込まれていなければ読み込む
+    if(!window.Tesseract){
+
+      await new Promise((resolve,reject)=>{
+
+        const s=document.createElement("script");
+
+        s.src=
+          "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+
+        s.onload=resolve;
+        s.onerror=reject;
+
+        document.head.appendChild(s);
+
+      });
+
+    }
+
+    $("ocrStatus").textContent=
+      "🔍 文字認識エンジンを起動中…";
+
+    const result=await Tesseract.recognize(
+      file,
+      "jpn+eng",
+      {
+        logger:m=>{
+
+          if(m.status==="recognizing text"){
+
+            const percent=Math.round(
+              (m.progress||0)*100
+            );
+
+            $("ocrStatus").textContent=
+              `🔍 文字を認識中… ${percent}%`;
+          }
+
+        }
+      }
+    );
+
+    const found=detect(result.data.text);
+
+    if(found.xid){
+
+      $("ocrStatus").innerHTML=
+        '<span class="ok">✓ X IDを認識しました。内容を確認してください。</span>';
+
+    }else{
+
+      $("ocrStatus").textContent=
+        "⚠️ @から始まるX IDを認識できませんでした。写真を撮り直すか手入力してください。";
+
+    }
+
+  }catch(err){
+
+    console.error("OCR error:",err);
+
+    $("ocrStatus").textContent=
+      "⚠️ 自動認識を起動できませんでした。X IDと名前を手入力してください。";
+
+    showReview("","");
+
+  }
+
 });
+
+
+// 配布済みに登録
 $("register").addEventListener("click",()=>{
- let name=$("name").value.trim(), xid=$("xid").value.trim();
- if(xid && !xid.startsWith("@")) xid="@"+xid;
- if(!name||!xid||xid==="@"){alert("名前とX IDを確認してください");return}
- const old=users.find(u=>u.xid.toLowerCase()===xid.toLowerCase());
- if(old){
-   if(old.given){alert("このX IDはすでに配布済みです。二重配布を防止しました。");return}
-   old.name=name;old.memo=$("memo").value.trim();old.given=true;old.givenAt=new Date().toLocaleString("ja-JP");
- }else{
-   users.unshift({id:Date.now().toString(),name,xid,memo:$("memo").value.trim(),given:true,date:new Date().toLocaleDateString("ja-JP"),givenAt:new Date().toLocaleString("ja-JP")});
- }
- save();$("review").style.display="none";$("photo").value="";$("preview").style.display="none";$("ocrStatus").textContent="写真を撮ると自動認識を開始します。";
- alert("🎖️ 配布済みとして登録しました！");
+
+  let name=$("name").value.trim();
+  let xid=$("xid").value.trim();
+
+  if(xid && !xid.startsWith("@")){
+    xid="@"+xid;
+  }
+
+  if(
+    !name ||
+    !xid ||
+    xid==="@"
+  ){
+    alert("名前とX IDを確認してください");
+    return;
+  }
+
+  const old=users.find(
+    u=>u.xid.toLowerCase()===xid.toLowerCase()
+  );
+
+  if(old){
+
+    if(old.given){
+
+      alert(
+        "このX IDはすでに配布済みです。二重配布を防止しました。"
+      );
+
+      return;
+    }
+
+    old.name=name;
+    old.memo=$("memo").value.trim();
+    old.given=true;
+    old.givenAt=new Date().toLocaleString("ja-JP");
+
+  }else{
+
+    users.unshift({
+      id:Date.now().toString(),
+      name:name,
+      xid:xid,
+      memo:$("memo").value.trim(),
+      given:true,
+      date:new Date().toLocaleDateString("ja-JP"),
+      givenAt:new Date().toLocaleString("ja-JP")
+    });
+
+  }
+
+  save();
+
+  $("review").style.display="none";
+  $("photo").value="";
+  $("preview").style.display="none";
+
+  $("ocrStatus").textContent=
+    "写真を撮ると自動認識を開始します。";
+
+  alert("🎖️ 配布済みとして登録しました！");
+
 });
-$("reset").addEventListener("click",()=>{$("review").style.display="none";$("photo").value="";$("preview").style.display="none";$("ocrStatus").textContent="写真を撮ると自動認識を開始します。"});
-$("search").addEventListener("input",render);
+
+
+// 撮り直す
+$("reset").addEventListener("click",()=>{
+
+  $("review").style.display="none";
+
+  $("photo").value="";
+
+  $("preview").style.display="none";
+
+  $("ocrStatus").textContent=
+    "写真を撮ると自動認識を開始します。";
+
+});
+
+
+// 検索
+$("search").addEventListener(
+  "input",
+  render
+);
+
+
+// 初期表示
 render();
-</script>
-</body></html>
