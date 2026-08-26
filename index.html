@@ -276,6 +276,7 @@ button{
 <script>
 
 const STORAGE_KEY = "hinamaru_users_v1";
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxY9U53zMsj5acE6_N34w5EaTKeHeCn1BR0anAGQzIF-ULEWzJNMY8jkUanjli27RqR/exec";
 
 let users = [];
 
@@ -295,7 +296,36 @@ function save(){
     JSON.stringify(users)
   );
 }
+async function syncToSheet(user){
 
+  try{
+
+    await fetch(SHEET_API_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"text/plain;charset=utf-8"
+      },
+      body:JSON.stringify({
+        xId:user.xid,
+        name:user.name,
+        status:user.given ? "配布済み" : "未配布",
+        registeredAt:user.createdAt,
+        registeredBy:"ひなまる隊"
+      })
+    });
+
+  }catch(error){
+
+    console.error(
+      "スプレッドシート連携エラー:",
+      error
+    );
+
+  }
+}
+
+
+  
 function normalizeXid(xid){
 
   xid = xid.trim();
@@ -478,7 +508,7 @@ function register(given){
   });
 
   save();
-
+syncToSheet(users[0]);
   document.getElementById("name").value = "";
   document.getElementById("xid").value = "";
   document.getElementById("memo").value = "";
