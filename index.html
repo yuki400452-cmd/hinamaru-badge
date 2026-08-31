@@ -509,7 +509,7 @@ const registeredBy =
     name:name,
     xid:xid,
     memo:memo,
-    registeredby:registeredBy,
+    registeredbBy:registeredBy,
     given:given,
     createdAt:
       new Date().toLocaleString("ja-JP")
@@ -517,7 +517,7 @@ const registeredBy =
   });
 
   save();
-syncToSheet(users[0]);
+syncToSheet(users.find(user => user.xid === xid));
   document.getElementById("name").value = "";
   document.getElementById("xid").value = "";
   document.getElementById("memo").value = "";
