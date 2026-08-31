@@ -1,602 +1,445 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<link rel="apple-touch-icon" href="./hinamaru_icon_180.png">
-
-<title>ひなまる隊｜缶バッジ配布管理</title>
-
-<style>
-:root{
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",
-  "Helvetica Neue",Meiryo,sans-serif;
-  color:#202124;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  background:#f4f7f6;
-}
-
-header{
-  background:linear-gradient(135deg,#008f7a,#19b99e);
-  color:white;
-  padding:24px 18px 22px;
-}
-
-header h1{
-  margin:0 0 6px;
-  font-size:24px;
-}
-
-header p{
-  margin:0;
-  font-size:14px;
-}
-
-main{
-  max-width:700px;
-  margin:auto;
-  padding:16px;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-bottom:16px;
-}
-
-.stat{
-  background:white;
-  border-radius:18px;
-  padding:16px 8px;
-  text-align:center;
-  box-shadow:0 3px 12px #0000000d;
-}
-
-.stat strong{
-  display:block;
-  font-size:27px;
-}
-
-.stat span{
-  color:#687074;
-  font-size:13px;
-}
-
-.card{
-  background:white;
-  border-radius:20px;
-  padding:18px;
-  margin-bottom:16px;
-  box-shadow:0 3px 14px #0000000d;
-}
-
-.card h2{
-  margin:0 0 14px;
-  font-size:18px;
-}
-
-label{
-  display:block;
-  margin:12px 0 6px;
-  font-weight:bold;
-  font-size:14px;
-}
-
-input{
-  width:100%;
-  padding:14px;
-  border:1px solid #d5dcda;
-  border-radius:12px;
-  font-size:16px;
-  background:#fff;
-}
-
-button{
-  width:100%;
-  border:0;
-  border-radius:12px;
-  padding:14px;
-  font-size:16px;
-  font-weight:bold;
-  margin-top:12px;
-  cursor:pointer;
-}
-
-.primary{
-  background:#008f7a;
-  color:white;
-}
-
-.secondary{
-  background:#eef3f2;
-  color:#202124;
-}
-
-.user{
-  border:1px solid #e0e5e3;
-  border-radius:14px;
-  padding:14px;
-  margin-top:10px;
-}
-
-.user-name{
-  font-size:17px;
-  font-weight:bold;
-}
-
-.user-xid{
-  color:#008f7a;
-  margin-top:3px;
-}
-
-.user-memo{
-  color:#687074;
-  font-size:13px;
-  margin-top:6px;
-}
-
-.user-status{
-  margin-top:10px;
-  font-weight:bold;
-}
-
-.given{
-  color:#008f7a;
-}
-
-.notgiven{
-  color:#e67e22;
-}
-
-.empty{
-  text-align:center;
-  color:#8a9290;
-  padding:20px 0;
-}
-
-.notice{
-  background:#f0faf7;
-  border-radius:12px;
-  padding:12px;
-  font-size:13px;
-  color:#087c6b;
-  margin-top:10px;
-}
-
-@media(max-width:500px){
-  main{
-    padding:12px;
-  }
-
-  .stats{
-    gap:7px;
-  }
-
-  .stat{
-    padding:13px 5px;
-  }
-
-  .stat strong{
-    font-size:24px;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ひなまる隊 缶バッジ管理</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+                   "Yu Gothic", Meiryo, sans-serif;
+      background: #f5f3f8;
+      color: #222;
+    }
+    header {
+      background: linear-gradient(135deg, #25133f, #55317b);
+      color: white;
+      padding: 22px 16px;
+    }
+    header h1 { margin: 0 0 6px; font-size: 24px; }
+    header p { margin: 0; opacity: .9; font-size: 13px; }
+    main { max-width: 900px; margin: 18px auto; padding: 0 12px 40px; }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.07);
+    }
+    h2 { margin: 0 0 16px; font-size: 19px; }
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 12px 0 6px;
+      font-size: 14px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font: inherit;
+      border-radius: 10px;
+    }
+    input, select, textarea {
+      border: 1px solid #d6d0df;
+      padding: 11px 12px;
+      background: #fff;
+    }
+    textarea { min-height: 76px; resize: vertical; }
+    button {
+      border: 0;
+      padding: 11px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+    .primary { background: #5b2d82; color: white; }
+    .secondary { background: #eee9f3; color: #3b2750; }
+    .danger { background: #f5dddd; color: #8b1e1e; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    }
+    .stat strong { display: block; font-size: 24px; }
+    .stat span { font-size: 12px; color: #666; }
+    .user {
+      border: 1px solid #e2dce8;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+      background: #fff;
+    }
+    .user-name { font-size: 18px; font-weight: 800; }
+    .user-xid { color: #666; margin-top: 3px; }
+    .user-memo { margin-top: 8px; white-space: pre-wrap; }
+    .user-meta { margin-top: 8px; font-size: 12px; color: #666; }
+    .status {
+      display: inline-block;
+      margin-top: 9px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .given { background: #e7f4e5; color: #286321; }
+    .notgiven { background: #f0edf3; color: #5c5364; }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .actions button { margin-top: 10px; }
+    #message {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+    .ok { background: #e7f5e9; color: #245b2c; }
+    .ng { background: #fdeaea; color: #8a1e1e; }
+    .small { font-size: 12px; color: #777; margin-top: 7px; }
+    @media (max-width: 650px) {
+      .grid, .stats, .actions { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-
 <body>
-
 <header>
-  <h1>🏅 ひなまる隊 缶バッジ配布管理</h1>
-  <p>名前とX IDを入力して配布状況を管理します</p>
+  <h1>🧸 ひなまる隊 缶バッジ管理</h1>
+  <p>配布ユーザーの登録・配布状況・登録者を管理します</p>
 </header>
 
 <main>
+  <div id="message"></div>
 
-  <section class="stats">
-    <div class="stat">
-      <strong id="total">0</strong>
-      <span>登録人数</span>
-    </div>
-
-    <div class="stat">
-      <strong id="givenCount">0</strong>
-      <span>配布済み</span>
-    </div>
-
-    <div class="stat">
-      <strong id="remaining">0</strong>
-      <span>未配布</span>
-    </div>
-  </section>
+  <div class="stats">
+    <div class="stat"><strong id="total">0</strong><span>登録者数</span></div>
+    <div class="stat"><strong id="givenCount">0</strong><span>配布済み</span></div>
+    <div class="stat"><strong id="remaining">0</strong><span>未配布</span></div>
+  </div>
 
   <section class="card">
     <h2>📝 配布ユーザーを登録</h2>
 
-    <label for="name">名前</label>
-    <input
-      id="name"
-      type="text"
-      placeholder="例：ひなちゃん"
-      autocomplete="off"
-    >
+    <div class="grid">
+      <div>
+        <label for="name">名前</label>
+        <input id="name" type="text" placeholder="例：ひなちゃん" autocomplete="off">
+      </div>
 
-    <label for="xid">X ID</label>
-    <input
-      id="xid"
-      type="text"
-      placeholder="例：@example"
-      autocomplete="off"
-    >
-<label for="registeredBy">登録者</label>
-<select id="registeredBy">
-    <option value="ひなまる隊">ひなまる隊</option>
-    <option value="ゆう">ゆう</option>
-    <option value="ちいくま">ちいくま</option>
-    <option value="ひなた">ひなた</option>
-</select>
-    <label for="memo">メモ（任意）</label>
-    <input
-      id="memo"
-      type="text"
-      placeholder="例：京都ミーグリ"
-      autocomplete="off"
-    >
-
-    <button class="primary" id="register">
-      🏅 配布済みとして登録
-    </button>
-
-    <button class="secondary" id="registerNotGiven">
-      未配布として登録
-    </button>
-
-    <div class="notice">
-      ※ X IDは「example」と入力しても自動で「@example」にします。
+      <div>
+        <label for="xid">X ID</label>
+        <input id="xid" type="text" placeholder="例：@example" autocomplete="off">
+      </div>
     </div>
+
+    <label for="registeredBy">登録者</label>
+    <select id="registeredBy">
+      <option value="ひなまる隊">ひなまる隊</option>
+      <option value="ゆう">ゆう</option>
+      <option value="ちいくま">ちいくま</option>
+      <option value="ひなた">ひなた</option>
+    </select>
+
+    <label for="memo">メモ（任意）</label>
+    <textarea id="memo" placeholder="例：京都1部で受け取り"></textarea>
+
+    <button class="primary" onclick="registerUser(false)">未配布で登録</button>
+    <button class="secondary" onclick="registerUser(true)">配布済みで登録</button>
+    <div class="small">登録者を選んでから登録してください。</div>
   </section>
 
   <section class="card">
-    <h2>🔎 配布ユーザー</h2>
-
-    <input
-      id="search"
-      type="text"
-      placeholder="名前・@ID・メモで検索"
-      autocomplete="off"
-    >
-
-    <div id="list"></div>
+    <h2>🔎 登録者を検索</h2>
+    <input id="search" type="search" placeholder="名前・X ID・メモ・登録者で検索" oninput="render()">
   </section>
 
+  <section class="card">
+    <h2>📋 登録一覧</h2>
+    <div id="list"></div>
+  </section>
 </main>
 
 <script>
+  // =========================================================
+  // ★ここだけ最初に変更
+  // Apps Scriptを「ウェブアプリ」としてデプロイしたURLを入れる
+  // 例：https://script.google.com/macros/s/XXXXXXXX/exec
+  // =========================================================
+  const SHEET_API_URL = "ここにApps ScriptのウェブアプリURLを貼る";
 
-const STORAGE_KEY = "hinamaru_users_v1";
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxY9U53zMsj5acE6_N34w5EaTKeHeCn1BR0anAGQzIF-ULEWzJNMY8jkUanjli27RqR/exec";
+  const STORAGE_KEY = "hinamaru_badge_users_v3";
+  let users = [];
 
-let users = [];
-
-function load(){
-  try{
-    users = JSON.parse(
-      localStorage.getItem(STORAGE_KEY) || "[]"
-    );
-  }catch(e){
-    users = [];
+  function showMessage(text, ok = true) {
+    const box = document.getElementById("message");
+    box.textContent = text;
+    box.className = ok ? "ok" : "ng";
+    box.style.display = "block";
+    setTimeout(() => box.style.display = "none", 3500);
   }
-}
 
-function save(){
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(users)
-  );
-}
-async function syncToSheet(user){
+  function normalizeXid(value) {
+    let v = String(value || "").trim();
+    if (!v) return "";
+    if (!v.startsWith("@")) v = "@" + v;
+    return v;
+  }
 
-  try{
+  function escapeHtml(text) {
+    return String(text ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-    await fetch(SHEET_API_URL,{
-      method:"POST",
-      headers:{
-        "Content-Type":"text/plain;charset=utf-8"
-      },
-      body:JSON.stringify({
-        xId:user.xid,
-        name:user.name,
-        status:user.given ? "配布済み" : "未配布",
-        registeredAt:user.createdAt,
-        registeredBy:user.registeredBy
-      })
+  function saveLocal() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+  }
+
+  function loadLocal() {
+    try {
+      users = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      if (!Array.isArray(users)) users = [];
+    } catch (_) {
+      users = [];
+    }
+  }
+
+  async function apiPost(payload) {
+    if (!SHEET_API_URL || SHEET_API_URL.includes("ここにApps Script")) {
+      throw new Error("Apps ScriptのウェブアプリURLがまだ設定されていません。");
+    }
+
+    const response = await fetch(SHEET_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
     });
 
-  }catch(error){
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (_) {
+      throw new Error("Google側から正しいJSONが返ってきませんでした。");
+    }
 
-    console.error(
-      "スプレッドシート連携エラー:",
-      error
+    if (!data.success) {
+      throw new Error(data.error || "Googleスプレッドシートへの保存に失敗しました。");
+    }
+    return data;
+  }
+
+  async function apiGet() {
+    if (!SHEET_API_URL || SHEET_API_URL.includes("ここにApps Script")) return null;
+
+    const response = await fetch(SHEET_API_URL + "?action=list", { method: "GET" });
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || "一覧取得に失敗しました。");
+    return data.users || [];
+  }
+
+  async function loadFromSheet() {
+    try {
+      const remote = await apiGet();
+      if (remote) {
+        users = remote;
+        saveLocal();
+        render();
+      }
+    } catch (error) {
+      console.warn(error);
+      showMessage("Googleからの読み込みに失敗したため、端末に保存されたデータを表示しています。", false);
+    }
+  }
+
+  async function registerUser(given) {
+    const name = document.getElementById("name").value.trim();
+    const xid = normalizeXid(document.getElementById("xid").value);
+    const memo = document.getElementById("memo").value.trim();
+    const registeredBy = document.getElementById("registeredBy").value;
+
+    if (!name || !xid) {
+      alert("名前とX IDを入力してください。");
+      return;
+    }
+
+    const exists = users.some(user =>
+      String(user.xid || "").toLowerCase() === xid.toLowerCase()
     );
 
+    if (exists) {
+      alert("このX IDはすでに登録されています。");
+      return;
+    }
+
+    const user = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      xid,
+      name,
+      memo,
+      registeredBy,
+      given: !!given,
+      createdAt: new Date().toLocaleString("ja-JP")
+    };
+
+    // まず画面側へ反映
+    users.unshift(user);
+    saveLocal();
+    render();
+
+    // Googleへ保存
+    try {
+      await apiPost({
+        action: "register",
+        ...user
+      });
+      showMessage(`「${registeredBy}」として登録しました。`);
+    } catch (error) {
+      // Google保存に失敗したら画面上の仮登録も戻す
+      users = users.filter(u => u.id !== user.id);
+      saveLocal();
+      render();
+      alert("登録に失敗しました。\n\n" + error.message);
+      return;
+    }
+
+    document.getElementById("name").value = "";
+    document.getElementById("xid").value = "";
+    document.getElementById("memo").value = "";
   }
-}
 
+  async function toggleGiven(id) {
+    const user = users.find(u => u.id === id);
+    if (!user) return;
 
-  
-function normalizeXid(xid){
+    const newGiven = !user.given;
+    user.given = newGiven;
+    saveLocal();
+    render();
 
-  xid = xid.trim();
-
-  if(!xid){
-    return "";
+    try {
+      await apiPost({
+        action: "update",
+        id: user.id,
+        xid: user.xid,
+        name: user.name,
+        memo: user.memo,
+        registeredBy: user.registeredBy,
+        given: user.given,
+        createdAt: user.createdAt
+      });
+      showMessage(newGiven ? "配布済みに変更しました。" : "未配布に戻しました。");
+    } catch (error) {
+      user.given = !newGiven;
+      saveLocal();
+      render();
+      alert("変更をGoogleへ保存できませんでした。\n\n" + error.message);
+    }
   }
 
-  if(!xid.startsWith("@")){
-    xid = "@" + xid;
+  async function deleteUser(id) {
+    const user = users.find(u => u.id === id);
+    if (!user) return;
+
+    if (!confirm(`${user.name}（${user.xid}）を削除しますか？`)) return;
+
+    const oldUsers = [...users];
+    users = users.filter(u => u.id !== id);
+    saveLocal();
+    render();
+
+    try {
+      await apiPost({ action: "delete", id: user.id, xid: user.xid });
+      showMessage("削除しました。");
+    } catch (error) {
+      users = oldUsers;
+      saveLocal();
+      render();
+      alert("Googleから削除できませんでした。\n\n" + error.message);
+    }
   }
 
-  return xid;
-}
+  function render() {
+    const keyword = document.getElementById("search").value.trim().toLowerCase();
 
-function updateStats(){
+    const filtered = users.filter(user => {
+      const text = [
+        user.name,
+        user.xid,
+        user.memo,
+        user.registeredBy
+      ].join(" ").toLowerCase();
+      return text.includes(keyword);
+    });
 
-  const total = users.length;
+    const list = document.getElementById("list");
+    list.innerHTML = "";
 
-  const given = users.filter(
-    user => user.given
-  ).length;
+    if (!filtered.length) {
+      list.innerHTML = '<div class="small">該当する登録者はいません。</div>';
+    }
 
-  document.getElementById("total").textContent = total;
-  document.getElementById("givenCount").textContent = given;
-  document.getElementById("remaining").textContent =
-    total - given;
-}
+    filtered.forEach(user => {
+      const div = document.createElement("div");
+      div.className = "user";
 
-function render(){
+      div.innerHTML = `
+        <div class="user-name">${escapeHtml(user.name)}</div>
+        <div class="user-xid">${escapeHtml(user.xid)}</div>
+        <div class="status ${user.given ? "given" : "notgiven"}">
+          ${user.given ? "🎁 配布済み" : "📦 未配布"}
+        </div>
+        ${user.memo ? `<div class="user-memo">${escapeHtml(user.memo)}</div>` : ""}
+        <div class="user-meta">
+          登録者：${escapeHtml(user.registeredBy || "不明")}
+          ／ 登録日時：${escapeHtml(user.createdAt || "")}
+        </div>
+        <div class="actions">
+          <button class="secondary" onclick="toggleGiven('${escapeHtml(user.id)}')">
+            ${user.given ? "未配布に戻す" : "配布済みにする"}
+          </button>
+          <button class="danger" onclick="deleteUser('${escapeHtml(user.id)}')">🗑 削除</button>
+        </div>
+      `;
 
-  const keyword =
-    document.getElementById("search")
-      .value
-      .trim()
-      .toLowerCase();
-
-  const list =
-    document.getElementById("list");
-
-  list.innerHTML = "";
-
-  const filtered = users.filter(user => {
-
-    const text = [
-      user.name,
-      user.xid,
-      user.memo
-    ]
-    .join(" ")
-    .toLowerCase();
-
-    return text.includes(keyword);
-  });
-
-  if(filtered.length === 0){
-
-    list.innerHTML =
-      '<div class="empty">登録ユーザーはいません</div>';
+      list.appendChild(div);
+    });
 
     updateStats();
-    return;
   }
 
-  filtered.forEach(user => {
+  function updateStats() {
+    const total = users.length;
+    const given = users.filter(u => u.given).length;
 
-    const div =
-      document.createElement("div");
-
-    div.className = "user";
-
-    div.innerHTML = `
-      <div class="user-name">
-        ${escapeHtml(user.name)}
-      </div>
-
-      <div class="user-xid">
-        ${escapeHtml(user.xid)}
-      </div>
-
-      ${
-        user.memo
-        ? `<div class="user-memo">
-             ${escapeHtml(user.memo)}
-           </div>`
-        : ""
-      }
-
-      <div class="user-status ${
-        user.given ? "given" : "notgiven"
-      }">
-        ${user.given ? "🏅 配布済み" : "⏳ 未配布"}
-      </div>
-
-      <button
-        class="secondary"
-        onclick="toggleGiven('${user.id}')"
-      >
-        ${user.given ? "未配布に戻す" : "配布済みにする"}
-      </button>
-
-      <button
-        class="secondary"
-        onclick="deleteUser('${user.id}')"
-      >
-        🗑 削除
-      </button>
-    `;
-
-    list.appendChild(div);
-  });
-
-  updateStats();
-}
-
-function escapeHtml(text){
-
-  return String(text)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function register(given){
-
-  const name =
-    document.getElementById("name")
-      .value
-      .trim();
-
-  const xid =
-    normalizeXid(
-      document.getElementById("xid").value
-    );
-
-  const memo =
-    document.getElementById("memo")
-      .value
-      .trim();
-const registeredBy =
-    document.getElementById("registeredBy").value;
-
-  if(!name || !xid){
-
-    alert("名前とX IDを入力してください。");
-    return;
+    document.getElementById("total").textContent = total;
+    document.getElementById("givenCount").textContent = given;
+    document.getElementById("remaining").textContent = total - given;
   }
 
-  const exists =
-    users.find(
-      user =>
-        user.xid.toLowerCase() ===
-        xid.toLowerCase()
-    );
-
-  if(exists){
-
-    alert(
-      "このX IDはすでに登録されています。"
-    );
-
-    return;
-  }
-
-  users.unshift({
-
-    id:
-      Date.now().toString() +
-      Math.random()
-        .toString(36)
-        .slice(2),
-
-    name:name,
-    xid:xid,
-    memo:memo,
-    registeredbBy:registeredBy,
-    given:given,
-    createdAt:
-      new Date().toLocaleString("ja-JP")
-
-  });
-
-  save();
-syncToSheet(users.find(user => user.xid === xid));
-  document.getElementById("name").value = "";
-  document.getElementById("xid").value = "";
-  document.getElementById("memo").value = "";
-document.getElementById("registeredBy").value = registeredBy;
+  loadLocal();
   render();
-
-  alert(
-    given
-      ? "🏅 配布済みとして登録しました！"
-      : "登録しました！"
-  );
-}
-
-function toggleGiven(id){
-
-  const user =
-    users.find(
-      user => user.id === id
-    );
-
-  if(!user) return;
-
-  user.given = !user.given;
-
-  save();
-  render();
-}
-
-function deleteUser(id){
-
-  const user =
-    users.find(
-      user => user.id === id
-    );
-
-  if(!user) return;
-
-  if(
-    !confirm(
-      `${user.name}（${user.xid}）を削除しますか？`
-    )
-  ){
-    return;
-  }
-
-  users =
-    users.filter(
-      user => user.id !== id
-    );
-
-  save();
-  render();
-}
-
-document
-  .getElementById("register")
-  .addEventListener(
-    "click",
-    () => register(true)
-  );
-
-document
-  .getElementById("registerNotGiven")
-  .addEventListener(
-    "click",
-    () => register(false)
-  );
-
-document
-  .getElementById("search")
-  .addEventListener(
-    "input",
-    render
-  );
-
-load();
-render();
-
+  loadFromSheet();
 </script>
-
 </body>
 </html>
