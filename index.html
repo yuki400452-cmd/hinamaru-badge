@@ -316,7 +316,7 @@ async function syncToSheet(user){
         name:user.name,
         status:user.given ? "配布済み" : "未配布",
         registeredAt:user.createdAt,
-        registeredby:user.registeredBy
+        registeredBy:user.registeredBy
       })
     });
 
