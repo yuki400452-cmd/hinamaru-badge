@@ -236,7 +236,13 @@ button{
       placeholder="例：@example"
       autocomplete="off"
     >
-
+<label for="registeredBy">登録者</label>
+<select id="registeredBy">
+    <option value="ひなまる隊">ひなまる隊</option>
+    <option value="ゆう">ゆう</option>
+    <option value="ちいくま">ちいくま</option>
+    <option value="ひなた">ひなた</option>
+</select>
     <label for="memo">メモ（任意）</label>
     <input
       id="memo"
@@ -310,7 +316,7 @@ async function syncToSheet(user){
         name:user.name,
         status:user.given ? "配布済み" : "未配布",
         registeredAt:user.createdAt,
-        registeredBy:"ひなまる隊"
+        registeredby:user.registeredBy
       })
     });
 
@@ -467,6 +473,8 @@ function register(given){
     document.getElementById("memo")
       .value
       .trim();
+const registeredBy =
+    document.getElementById("registeredBy").value;
 
   if(!name || !xid){
 
@@ -501,6 +509,7 @@ function register(given){
     name:name,
     xid:xid,
     memo:memo,
+    registeredby:registeredBy,
     given:given,
     createdAt:
       new Date().toLocaleString("ja-JP")
@@ -512,7 +521,7 @@ syncToSheet(users[0]);
   document.getElementById("name").value = "";
   document.getElementById("xid").value = "";
   document.getElementById("memo").value = "";
-
+document.getElementById("registeredBy").value = "ひなまる隊";
   render();
 
   alert(
